@@ -18,20 +18,12 @@ public class PlayerMovement : MonoBehaviour
     // Updates <moveDir> based on what arrow button is held, and rotates sprite accordingly:
     void Update()
     {
-        // Update used to handle movement, but that has been delegated to FixedUpdate().
-        //-Non-Rigidbody2D-movement-----------------------
-        // float moveSpeedDt = moveSpeed * Time.deltaTime;
-        // Vector3 pos = transform.position;
         moveDir = Vector3.zero;
 
         if (Input.GetKey(KeyCode.UpArrow)) { moveDir.y += 1; }
         else if (Input.GetKey(KeyCode.LeftArrow)) { moveDir.x -= 1; }
         else if (Input.GetKey(KeyCode.DownArrow)) { moveDir.y -= 1; }
         else if (Input.GetKey(KeyCode.RightArrow)) { moveDir.x += 1; }
-
-        //-Non-Rigidbody2D-movement-----------------------
-        // pos += moveDir.normalized * moveSpeedDt;
-        // transform.position = pos;
 
         bool playerIsMoving = moveDir.sqrMagnitude > 0.01f;
         if (playerIsMoving)
