@@ -1,8 +1,9 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
-    // Anything in [] is just something displayed in the editor.
+    // This [] is an attribute, attributes mostly provide additional info in the editor.
     [SerializeField, Tooltip("Distance moved per frame in meters per second")]
     private float moveSpeed = 5f;
 
@@ -53,7 +54,7 @@ public class PlayerMovement : MonoBehaviour
     // Returns a quaternion representing a rotation of <angle> degrees:
     Quaternion RotateBy(float angle)
     {
-        // (Note, depending on direction your sprite faces you may need to +/= 90).
+        // (Note, depending on direction your sprite faces you may need to +/- 90).
         return Quaternion.Euler(0f, 0f, angle + 90f);  
     }
 }
