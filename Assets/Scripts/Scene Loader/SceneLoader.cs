@@ -75,7 +75,7 @@ public class SceneLoader : MonoBehaviour
     {
         fadeCanvasGroup.blocksRaycasts = true;  // Disables most input during the duration of the fade.
 
-        float initAlpha = (fadeCanvasGroup.alpha), time = (0f);
+        float initAlpha = fadeCanvasGroup.alpha, time = 0f;
 
         while (time < fadeDuration)
         {
