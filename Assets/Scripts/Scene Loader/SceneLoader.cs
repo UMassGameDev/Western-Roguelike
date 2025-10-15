@@ -29,7 +29,9 @@ public class SceneLoader : MonoBehaviour
     // } then makes Instance persist across scenes:
     void Awake()
     {
-        if (Instance != null && Instance != this)
+        bool instanceExists = (Instance != null), instanceIsNotThis = (Instance != this); 
+
+        if (instanceExists && instanceIsNotThis)
         {
             Destroy(gameObject);
             return;
@@ -57,34 +59,38 @@ public class SceneLoader : MonoBehaviour
     // Fades out, loads scene denoted by <sceneName>, and fades back in.
     private IEnumerator LoadSceneRoutine(string sceneName)
     {
-        yield return StartCoroutine(Fade(1f));
+        yield return StartCoroutine(Fade(1f));  // Fade out.
 
-        AsyncOperation op = SceneManager.LoadSceneAsync(sceneName);
+        AsyncOperation op = SceneManager.LoadSceneAsync(sceneName);  // Switch scene.
         while (!op.isDone)
         {
             yield return null;
         }
 
-        yield return StartCoroutine(Fade(0f));
+        yield return StartCoroutine(Fade(0f));  // Fade in.
     }
 
-    // Fades <fadeCanvasGroup> from current alpha value to <targetAlpha>
+    // Fades <fadeCanvasGroup> from current alpha value to <targetAlpha> (alpha = transparency, 0 being invisible, 1 being visible).
     private IEnumerator Fade(float targetAlpha)
     {
-        fadeCanvasGroup.blocksRaycasts = true;
+        fadeCanvasGroup.blocksRaycasts = true;  // Disables most input during the duration of the fade.
 
-        float startAlpha = fadeCanvasGroup.alpha;
-        float time = 0f;
+        float initAlpha = (fadeCanvasGroup.alpha), time = (0f);
 
         while (time < fadeDuration)
         {
             time += Time.unscaledDeltaTime;
-            float updatedAlpha = Mathf.Lerp(startAlpha, targetAlpha, time / fadeDuration);
-            fadeCanvasGroup.alpha = updatedAlpha;
+            fadeCanvasGroup.alpha = CalculateCurrentAlpha(initAlpha, targetAlpha, time);
             yield return null;
         }
 
         fadeCanvasGroup.alpha = targetAlpha;
-        fadeCanvasGroup.blocksRaycasts = targetAlpha != 0f;
+        fadeCanvasGroup.blocksRaycasts = targetAlpha != 0f;  // Re-enables the input if this fade was not a fade out.
+    }
+
+    // Interpolates between <initAlpha> & <targetAlpha>, based on the ratio of <currentTime> / <fadeDuration> (time passed out of duration).
+    private float CalculateCurrentAlpha(float initAlpha, float targetAlpha, float currentTime)
+    {
+        return Mathf.Lerp(initAlpha, targetAlpha, currentTime / fadeDuration);
     }
 }
