@@ -42,6 +42,8 @@ public class PlayerMovement : MonoBehaviour
         playerRB.MovePosition(playerRB.position + (Vector2)(moveDir * moveSpeedDt));
     }
 
+    //~(Helper Methods)~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     [System.Obsolete("Obsolete if using multiple direction sprites for player.")]
     // Returns the angle made between <moveDir> and the positive x-axis, in degrees:
     float CalculateAngle(Vector3 moveDir) => Mathf.Atan2(moveDir.y, moveDir.x) * Mathf.Rad2Deg;

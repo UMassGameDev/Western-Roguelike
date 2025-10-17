@@ -88,6 +88,8 @@ public class SceneLoader : MonoBehaviour
         fadeCanvasGroup.blocksRaycasts = targetAlpha != 0f;  // Re-enables the input if this fade was not a fade out.
     }
 
+    //~(Helper Methods)~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     // Interpolates between <initAlpha> & <targetAlpha>, based on the ratio of <currentTime> / <fadeDuration> (time passed out of duration).
     private float CalculateCurrentAlpha(float initAlpha, float targetAlpha, float currentTime) => Mathf.Lerp(initAlpha, targetAlpha, currentTime / fadeDuration);
 }
