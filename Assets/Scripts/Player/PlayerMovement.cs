@@ -44,17 +44,9 @@ public class PlayerMovement : MonoBehaviour
 
     [System.Obsolete("Obsolete if using multiple direction sprites for player.")]
     // Returns the angle made between <moveDir> and the positive x-axis, in degrees:
-    float CalculateAngle(Vector3 moveDir)
-    {
-        float angleInRad = Mathf.Atan2(moveDir.y, moveDir.x);
-        return angleInRad * Mathf.Rad2Deg;
-    }
+    float CalculateAngle(Vector3 moveDir) => Mathf.Atan2(moveDir.y, moveDir.x) * Mathf.Rad2Deg;
 
     [System.Obsolete("Obsolete if using multiple direction sprites for player.")]
     // Returns a quaternion representing a rotation of <angle> degrees:
-    Quaternion RotateBy(float angle)
-    {
-        // (Note, depending on direction your sprite faces you may need to +/- 90).
-        return Quaternion.Euler(0f, 0f, angle + 90f);  
-    }
+    Quaternion RotateBy(float angle) => Quaternion.Euler(0f, 0f, angle + 90f);  // (Note, depending on direction your sprite faces you may need to +/- 90).
 }
