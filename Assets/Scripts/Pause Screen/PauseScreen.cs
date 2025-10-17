@@ -5,7 +5,7 @@ using UnityEngine.Analytics;
 
 public class PauseMenu : MonoBehaviour
 {
-    [SerializeField, Tooltip("The pause menu panel")]
+    [SerializeField, Tooltip("The pause menu panel.")]
     private GameObject pauseMenuUI;
 
     private static bool isPaused = false;
