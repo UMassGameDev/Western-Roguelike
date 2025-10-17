@@ -3471,8 +3471,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1775961384}
-        m_TargetAssemblyTypeName: PauseMenu, Assembly-CSharp
+      - m_Target: {fileID: 1775961385}
+        m_TargetAssemblyTypeName: Menu, Assembly-CSharp
         m_MethodName: Quit
         m_Mode: 1
         m_Arguments:
@@ -4650,6 +4650,7 @@ GameObject:
   - component: {fileID: 1775961381}
   - component: {fileID: 1775961380}
   - component: {fileID: 1775961384}
+  - component: {fileID: 1775961385}
   m_Layer: 5
   m_Name: Pause Menu (Canvas)
   m_TagString: Untagged
@@ -4753,6 +4754,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   pauseMenuUI: {fileID: 672129055}
+--- !u!114 &1775961385
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1775961379}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f1510cc32f2a114428623bdc1c233374, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &2081755052
 GameObject:
   m_ObjectHideFlags: 0
