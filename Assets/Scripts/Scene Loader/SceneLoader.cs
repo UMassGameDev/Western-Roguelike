@@ -89,8 +89,5 @@ public class SceneLoader : MonoBehaviour
     }
 
     // Interpolates between <initAlpha> & <targetAlpha>, based on the ratio of <currentTime> / <fadeDuration> (time passed out of duration).
-    private float CalculateCurrentAlpha(float initAlpha, float targetAlpha, float currentTime)
-    {
-        return Mathf.Lerp(initAlpha, targetAlpha, currentTime / fadeDuration);
-    }
+    private float CalculateCurrentAlpha(float initAlpha, float targetAlpha, float currentTime) => Mathf.Lerp(initAlpha, targetAlpha, currentTime / fadeDuration);
 }
