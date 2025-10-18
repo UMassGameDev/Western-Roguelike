@@ -8,7 +8,7 @@ public class PauseMenu : MonoBehaviour
     [SerializeField, Tooltip("The pause menu panel.")]
     private GameObject pauseMenuUI;
 
-    private static bool isPaused = false;
+    public static bool isPaused = false;
     
     // Instance of PauseMenu, available to all other scripts:
     public static PauseMenu Instance { get; private set; }
@@ -33,6 +33,19 @@ public class PauseMenu : MonoBehaviour
         // Ensure the menu starts hidden.
         if (pauseMenuUI != null) { pauseMenuUI.SetActive(false); }
     }
+
+
+    private void OnEnable()
+    {
+        // Disable if this is the main menu scene.
+        string sceneName = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
+        if (sceneName == "MainMenu")
+        {
+            gameObject.SetActive(false);
+            isPaused = false;
+        }
+    }
+
 
     // Pauses / Unpauses the game based on whether already <isPaused>, when esc is pressed.
     void Update()

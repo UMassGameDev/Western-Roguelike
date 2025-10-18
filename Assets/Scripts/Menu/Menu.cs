@@ -22,7 +22,10 @@ public class Menu : MonoBehaviour
     {
         SceneLoader.Instance.LoadSceneWithFade("MainScene");
     }
-
+    public static void MainMenu()
+    {
+        SceneLoader.Instance.LoadSceneWithFade("TitleScene");
+    }
     /// <summary>
     ///     Quits the application.
     /// </summary>
