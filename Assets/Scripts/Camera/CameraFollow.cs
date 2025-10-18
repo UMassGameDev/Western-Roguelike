@@ -8,7 +8,7 @@ public class CameraFollow : MonoBehaviour
 
     void Start()
     {
-        // Find the player dynamically
+        // Finds where the player is.
         GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
         if (playerObj != null)
         {
@@ -16,11 +16,11 @@ public class CameraFollow : MonoBehaviour
         }
         else
         {
-            Debug.LogWarning("Player not found! Make sure it is tagged 'Player'");
+            Debug.LogWarning("playerObj not found.");
         }
     }
 
-    void LateUpdate()
+    void FixedUpdate()
     {
         if (target == null) return;
 
