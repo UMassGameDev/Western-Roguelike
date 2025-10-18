@@ -9,6 +9,30 @@ public class PauseMenu : MonoBehaviour
     private GameObject pauseMenuUI;
 
     private static bool isPaused = false;
+    
+    // Instance of PauseMenu, available to all other scripts:
+    public static PauseMenu Instance { get; private set; }
+
+    // Checks that { 
+    //    1:) there is only 1 <Instance>
+    //    2:) it is this one
+    // } then makes Instance persist across scenes:
+    void Awake()
+    {
+        bool instanceExists = (Instance != null), instanceIsNotThis = (Instance != this);
+
+        if (instanceExists && instanceIsNotThis)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
+        Instance = this;
+        DontDestroyOnLoad(gameObject);
+
+        // Ensure the menu starts hidden.
+        if (pauseMenuUI != null) { pauseMenuUI.SetActive(false); }
+    }
 
     // Pauses / Unpauses the game based on whether already <isPaused>, when esc is pressed.
     void Update()
