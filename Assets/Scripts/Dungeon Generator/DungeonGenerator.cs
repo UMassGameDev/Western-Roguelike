@@ -18,28 +18,42 @@ public class DungeonGenerator : MonoBehaviour
         new Vector2Int(-1, 0)   // West / Left
     };
 
-    public enum Tile
-    {
-        Wall, Floor
-    }
+    public enum Tile { Wall, Floor }
 
-    [Header("Tile Assets")]
-    public TileBase wallTile;
-    public TileBase floorTile;
+    [Header("Player:")]
+    [SerializeField, Tooltip("The player object spawned in the scene.")] 
+    private GameObject playerPrefab;
 
-    public int dungeonWidth = 51;
-    public int dungeonHeight = 51;
-    public int numRoomTries = 50;
-    public int roomExtraSize = 0;
-    public int windingPercent = 0;
+    [Header("Rendered tiles:")]
+    [SerializeField, Tooltip("Tile used to represent walls.")]
+    private TileBase wallTile;
+    [SerializeField, Tooltip("Tile used to represent floors.")]
+    private TileBase floorTile;
+
+    [Header("Dungeon Parameters:")]
+    [SerializeField, Tooltip("Max width of generated dungeon.")]
+    private int dungeonWidth = 51;
+    [SerializeField, Tooltip("Max height of generated dungeon.")]
+    private int dungeonHeight = 51;
+
+    [SerializeField, Tooltip("# of tries to generate rooms.")]
+    private int numRoomTries = 50;
+    [SerializeField, Tooltip("Added onto max value of initial room size.")]
+    private int roomExtraSize = 0;
+    [SerializeField, Tooltip("How many turns in passageways between rooms, 0-100%."), Range(0, 100)]
+    private int windingPercent = 0;
+    [SerializeField, Tooltip("How much bigger the buffer is than the dungeon.")]
+    private int bufferScale = 2;
 
     private Tile[,] tiles;
+    private Tile[,] buffer;
+
     private int[,] regions;
     private int currentRegion = -1;
 
     private List<RectInt> rooms = new List<RectInt>();
 
-    [SerializeField] private GameObject playerPrefab;
+    
 
     void Awake()
     {
@@ -53,6 +67,7 @@ public class DungeonGenerator : MonoBehaviour
     private void Generate()
     {
         tiles = new Tile[dungeonWidth, dungeonHeight];
+        buffer = new Tile[dungeonWidth * bufferScale, dungeonHeight * bufferScale];
         Fill(Tile.Wall);
 
         regions = new int[dungeonWidth, dungeonHeight];
@@ -66,11 +81,18 @@ public class DungeonGenerator : MonoBehaviour
     // Fills <tiles[x, y]> with wall tiles by default.
     private void Fill(Tile fillTile)
     {
-        for (int x = 0; x < dungeonWidth; x++)  // !!! See if you can do a foreach loop instead.
+        for (int x = 0; x < dungeonWidth; x++)
         {
             for (int y = 0; y < dungeonHeight; y++)
             {
                 tiles[x, y] = fillTile;
+            }
+        }
+        for (int x = 0; x < dungeonWidth * bufferScale; x++)
+        {
+            for (int y = 0; y < dungeonHeight * bufferScale; y++)
+            {
+                buffer[x, y] = fillTile;
             }
         }
     }
@@ -82,15 +104,15 @@ public class DungeonGenerator : MonoBehaviour
         for (int i = 0; i < numRoomTries; i++)
         {
             // Create randomly sized square and variation (<rectangularity>).
-            int squareSize = randomSquareSize();
-            int rectangularity = randomRectangularity(squareSize);
+            int squareSize = randSquareSize();
+            int variation = randRectangularity(squareSize);
 
             int roomWidth, roomHeight;
             roomWidth = roomHeight = squareSize;
 
             // Randomly decide through 50/50 odds what side gets the variation.
-            if (Random.value < 0.5f) { roomWidth += rectangularity; }
-            else { roomHeight += rectangularity; }
+            if (Random.value < 0.5f) { roomWidth += variation; }
+            else { roomHeight += variation; }
 
             // Find a random odd x & y coord for this rooms top left corner.
             int x = Random.Range(0, (dungeonWidth - roomWidth) / 2) * 2 + 1;
@@ -101,7 +123,7 @@ public class DungeonGenerator : MonoBehaviour
 
             // If this overlaps with another room, restart the loop.
             bool overlaps = rooms.Any(r => r.Overlaps(room));
-            if (overlaps) continue;
+            if (overlaps) { continue; }
 
             // Add room to list of currently placed rooms, to check other rooms against for overlap.
             rooms.Add(room);
@@ -120,19 +142,9 @@ public class DungeonGenerator : MonoBehaviour
         }
     }
     // Generates a random size for the base square.
-    int randomSquareSize() => (Random.Range(1, 3 + roomExtraSize) * 2) + 1;
+    int randSquareSize() => (Random.Range(1, 3 + roomExtraSize) * 2) + 1;
     // Generates a random variation to be added to the dungeonWidth or dungeonHeight of the square.
-    int randomRectangularity(int squareSize) => Random.Range(0, 1 + squareSize / 2) * 2;
-
-    // Makes tile at <pos> a floor tile, and adds it to the region array.
-    private void Carve(Vector2Int pos, Tile type = Tile.Floor)
-    {
-        tiles[pos.x, pos.y] = type;
-        regions[pos.x, pos.y] = currentRegion;
-    }
-
-    // Creates a unique number for the new region.
-    private void StartRegion() => currentRegion++;
+    int randRectangularity(int squareSize) => Random.Range(0, 1 + squareSize / 2) * 2;
 
     //~(FillWithMazes)~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Calls GrowMaze() on every odd numbered tile that is not already a floor (Odd numbered to keep).
@@ -142,8 +154,7 @@ public class DungeonGenerator : MonoBehaviour
         {
             for (int x = 1; x < dungeonWidth; x += 2)
             {
-                bool isWall = tiles[x, y] == Tile.Wall;
-                if (!isWall) { continue; }
+                if (!(tiles[x, y] == Tile.Wall)) { continue; }
                 GrowMaze(new Vector2Int(x, y));
             }
         }
@@ -336,6 +347,18 @@ public class DungeonGenerator : MonoBehaviour
         int offsetX = -dungeonWidth / 2;
         int offsetY = -dungeonHeight / 2;
 
+        for (int x = 0; x < dungeonWidth * bufferScale; x++)
+        {
+            for (int y = 0; y < dungeonHeight * bufferScale; y++)
+            {
+                TileBase tileAsset = null;
+
+                if (buffer[x, y] == Tile.Wall) { tileAsset = wallTile; }
+                else if (buffer[x, y] == Tile.Floor) { tileAsset = floorTile; }
+                if (tileAsset != null) { tilemap.SetTile(new Vector3Int(x + offsetX * 2, y + offsetY * 2, 0), tileAsset); }
+            }
+        }
+
         for (int x = 0; x < dungeonWidth; x++)
         {
             for (int y = 0; y < dungeonHeight; y++)
@@ -348,4 +371,15 @@ public class DungeonGenerator : MonoBehaviour
             }
         }
     }
+
+    //~(HelperMethods)~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // Makes tile at <pos> a floor tile, and adds it to the region array.
+    private void Carve(Vector2Int pos, Tile type = Tile.Floor)
+    {
+        tiles[pos.x, pos.y] = type;
+        regions[pos.x, pos.y] = currentRegion;
+    }
+
+    // Creates a unique number for the new region.
+    private void StartRegion() => currentRegion++;
 }
