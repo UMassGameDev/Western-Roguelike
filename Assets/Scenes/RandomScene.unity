@@ -228,7 +228,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 5
+  orthographic size: 5.625
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -253,7 +253,7 @@ Transform:
   m_GameObject: {fileID: 199549759}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -10}
+  m_LocalPosition: {x: 37.456554, y: 20.398901, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -518,7 +518,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3d6a90301d962b1468d4b1636aa55124, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerPrefab: {fileID: 7643162622177375408, guid: c00c324b2e4b63d42b4e2ac9eb6c35c9, type: 3}
+  playerPrefab: {fileID: 6622966133622132808, guid: 2bcbb7500a891274ab893eaf5c028db3, type: 3}
   wallTile: {fileID: 11400000, guid: 4a9f1fbea4cf6ff4d8dd3eeb179b557f, type: 2}
   floorTile: {fileID: 11400000, guid: 9558e05e3b7aaef4680eeb3fd7667c9d, type: 2}
   dungeonWidth: 51
