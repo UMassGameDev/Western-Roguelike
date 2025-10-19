@@ -5192,6 +5192,10 @@ PrefabInstance:
       propertyPath: sceneToLoad
       value: CaveScene
       objectReference: {fileID: 0}
+    - target: {fileID: 2967202496284828573, guid: 3aef668f889412d4786d30e4bef51745, type: 3}
+      propertyPath: targetScene
+      value: RandomScene
+      objectReference: {fileID: 0}
     - target: {fileID: 3139744571970662573, guid: 3aef668f889412d4786d30e4bef51745, type: 3}
       propertyPath: m_Name
       value: CaveDoorTrigger
