@@ -9,7 +9,10 @@ public class PauseMenu : MonoBehaviour
     private GameObject pauseMenuUI;
 
     public static bool isPaused = false;
-
+    void Awake()
+    {
+        if (Time.timeScale == 0f) { Time.timeScale = 1f; }
+    }
     // Pauses / Unpauses the game based on whether already <isPaused>, when esc is pressed.
     void Update()
     {
@@ -26,6 +29,7 @@ public class PauseMenu : MonoBehaviour
         pauseMenuUI.SetActive(false);
         Time.timeScale = 1f;
         isPaused = false;
+        Debug.Log("Time restored!");
     }
 
     // Unhides <pauseMenuUI>, freezes time, and updates <isPaused>.
@@ -34,5 +38,6 @@ public class PauseMenu : MonoBehaviour
         pauseMenuUI.SetActive(true);
         Time.timeScale = 0f;
         isPaused = true;
+        Debug.Log("Time paused!");
     }
 }
