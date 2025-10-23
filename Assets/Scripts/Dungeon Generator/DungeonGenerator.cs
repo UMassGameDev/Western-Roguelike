@@ -53,7 +53,7 @@ public class DungeonGenerator : MonoBehaviour
 
     private List<RectInt> rooms = new List<RectInt>();
 
-    
+
 
     void Awake()
     {
@@ -64,6 +64,8 @@ public class DungeonGenerator : MonoBehaviour
 
     //~(Generate)~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Calls all functions needed to properly generate the dungeon.
+    // This is a big one, so I'll describe the algorithm and how it is used.
+    // To Generate(), 
     private void Generate()
     {
         tiles = new Tile[dungeonWidth, dungeonHeight];
@@ -78,7 +80,7 @@ public class DungeonGenerator : MonoBehaviour
     }
 
     //~(Fill)~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // Fills <tiles[x, y]> with wall tiles by default.
+    // Fills <tiles[x, y]> & <buffer[x, y]> with wall tiles by default.
     private void Fill(Tile fillTile)
     {
         for (int x = 0; x < dungeonWidth; x++)
@@ -294,6 +296,7 @@ public class DungeonGenerator : MonoBehaviour
         {
             done = true;
             for (int x = 1; x < dungeonWidth - 1; x++)
+            {
                 for (int y = 1; y < dungeonHeight - 1; y++)
                 {
                     if (tiles[x, y] == 0) { continue; }
@@ -307,6 +310,7 @@ public class DungeonGenerator : MonoBehaviour
                     done = false;
                     tiles[x, y] = 0;
                 }
+            }
         }
     }
 

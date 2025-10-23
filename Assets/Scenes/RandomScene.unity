@@ -491,7 +491,7 @@ MonoBehaviour:
   floorTile: {fileID: 11400000, guid: 9558e05e3b7aaef4680eeb3fd7667c9d, type: 2}
   dungeonWidth: 51
   dungeonHeight: 51
-  numRoomTries: 50
+  numRoomTries: 150
   roomExtraSize: 0
   windingPercent: 0
   bufferScale: 2
