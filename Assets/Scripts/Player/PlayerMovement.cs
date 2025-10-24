@@ -25,13 +25,15 @@ public class PlayerMovement : MonoBehaviour
         if (Input.GetKey(KeyCode.LeftArrow)) { moveDir.x -= 1; }
         if (Input.GetKey(KeyCode.DownArrow)) { moveDir.y -= 1; }
         if (Input.GetKey(KeyCode.RightArrow)) { moveDir.x += 1; }
-
+        
+        /*
         bool playerIsMoving = moveDir.sqrMagnitude > 0.01f;
         if (playerIsMoving && Time.timeScale != 0)  // Time.timeScale != 0 is needed because otherwise rotating is not bound by time.
         {
             float angle = CalculateAngle(moveDir);
             transform.rotation = RotateBy(angle);
         }
+        */
     }
 
     // Fixed update is just Update() for physics interactions.
