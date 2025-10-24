@@ -3,17 +3,15 @@ using UnityEngine.UI;
 
 public class CustomCursor : MonoBehaviour
 {
-    [SerializeField]
-    Image cursorImage;
-    [SerializeField]
-    float cursorScale = 1.0f;
-    const int gridSize = 16;
+    [SerializeField] private Image cursorImage;
+    [SerializeField] private float cursorScale = 1.0f;
+    private const int gridSize = 16;
 
     void Start()
     {
         Cursor.visible = false;
         if (cursorImage == null) return;
-        
+
         cursorImage.rectTransform.localScale = Vector3.one * cursorScale;
     }
 
@@ -21,16 +19,11 @@ public class CustomCursor : MonoBehaviour
     {
         if (cursorImage == null) return;
 
-        RectTransform canvasRect = cursorImage.canvas.transform as RectTransform;
-        RectTransformUtility.ScreenPointToLocalPointInRectangle(
-            canvasRect,
-            Input.mousePosition,
-            cursorImage.canvas.worldCamera,
-            out Vector2 localPoint
-        );
+        Vector2 pos = Input.mousePosition;
 
-        localPoint.x = Mathf.Round(localPoint.x / gridSize) * gridSize;
-        localPoint.y = Mathf.Round(localPoint.y / gridSize) * gridSize;
-        cursorImage.rectTransform.localPosition = localPoint;
+        pos.x = Mathf.Round(pos.x / gridSize) * gridSize;
+        pos.y = Mathf.Round(pos.y / gridSize) * gridSize;
+
+        cursorImage.rectTransform.position = pos;
     }
 }
