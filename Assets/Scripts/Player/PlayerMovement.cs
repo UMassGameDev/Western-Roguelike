@@ -22,9 +22,9 @@ public class PlayerMovement : MonoBehaviour
         moveDir = Vector3.zero;
 
         if (Input.GetKey(KeyCode.UpArrow)) { moveDir.y += 1; }
-        else if (Input.GetKey(KeyCode.LeftArrow)) { moveDir.x -= 1; }
-        else if (Input.GetKey(KeyCode.DownArrow)) { moveDir.y -= 1; }
-        else if (Input.GetKey(KeyCode.RightArrow)) { moveDir.x += 1; }
+        if (Input.GetKey(KeyCode.LeftArrow)) { moveDir.x -= 1; }
+        if (Input.GetKey(KeyCode.DownArrow)) { moveDir.y -= 1; }
+        if (Input.GetKey(KeyCode.RightArrow)) { moveDir.x += 1; }
 
         bool playerIsMoving = moveDir.sqrMagnitude > 0.01f;
         if (playerIsMoving && Time.timeScale != 0)  // Time.timeScale != 0 is needed because otherwise rotating is not bound by time.
