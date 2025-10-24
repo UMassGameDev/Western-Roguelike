@@ -11,11 +11,13 @@ public class CustomCursor : MonoBehaviour
     void Start()
     {
         Cursor.visible = false;
-        if (cursorImage != null) { cursorImage.rectTransform.localScale = Vector3.one * cursorScale; }
+        if (cursorImagePresent()) { cursorImage.rectTransform.localScale = Vector3.one * cursorScale; }
     }
 
     void Update()
     {
-        if (cursorImage != null) { cursorImage.transform.position = Input.mousePosition; }
+        if (cursorImagePresent()) { cursorImage.transform.position = Input.mousePosition; }
     }
+
+    bool cursorImagePresent() => cursorImage != null;
 }
