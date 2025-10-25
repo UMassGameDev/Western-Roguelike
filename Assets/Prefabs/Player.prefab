@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4455725133419971136}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Muzzle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -25,7 +25,7 @@ Transform:
   m_GameObject: {fileID: 1817369894223556100}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: -0.437497, z: -0.0037927383}
+  m_LocalPosition: {x: 0, y: -0.44, z: -0.0037927383}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -46,7 +46,7 @@ GameObject:
   - component: {fileID: 844629399406508719}
   - component: {fileID: 801197960613546519}
   - component: {fileID: 611797521086465749}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Player
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -234,3 +234,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 73b9c8d6461a59e46a5ab44ea0597e4f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  bulletObj: {fileID: 0}
+  muzzle: {fileID: 0}

@@ -6,6 +6,7 @@ public class Bullet : MonoBehaviour
     public float lifetime = 2f;
 
     private Vector2 direction;
+    private Rigidbody2D rb;
 
     public void Initialize(Vector2 shootDirection)
     {
@@ -13,15 +14,18 @@ public class Bullet : MonoBehaviour
         Destroy(gameObject, lifetime);
     }
 
-    void Update()
+    void Awake()
     {
-        transform.Translate(direction * speed * Time.deltaTime, Space.World);
+        rb = GetComponent<Rigidbody2D>();
     }
 
-    private void OnTriggerEnter2D(Collider2D collision)
+    void FixedUpdate()
     {
-        Debug.Log("Collision Dectected!");
-        // Example: destroy on hit
+        rb.MovePosition(rb.position + direction * speed * Time.fixedDeltaTime);
+    }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
         Destroy(gameObject);
     }
 }

@@ -180,7 +180,7 @@ GameObject:
   - component: {fileID: 174721363}
   - component: {fileID: 174721362}
   - component: {fileID: 174721361}
-  m_Layer: 1
+  m_Layer: 0
   m_Name: Terrain Tilemap
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3491,6 +3491,11 @@ Camera:
   m_CorrespondingSourceObject: {fileID: 7267738376685782560, guid: f9e6328026d43a649a47cf4284ba67db, type: 3}
   m_PrefabInstance: {fileID: 8609974461034201110}
   m_PrefabAsset: {fileID: 0}
+--- !u!82 &614452756 stripped
+AudioSource:
+  m_CorrespondingSourceObject: {fileID: -4521012019761372971, guid: fca8d11eb8a48c44cbbbff7f7512431a, type: 3}
+  m_PrefabInstance: {fileID: 7698536661465641939}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &619394800
 GameObject:
   m_ObjectHideFlags: 0
@@ -3575,6 +3580,11 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!4 &1140091180 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4455725133419971136, guid: 2bcbb7500a891274ab893eaf5c028db3, type: 3}
+  m_PrefabInstance: {fileID: 1668466834}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1267578780
 GameObject:
   m_ObjectHideFlags: 0
@@ -3768,6 +3778,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 611797521086465749, guid: 2bcbb7500a891274ab893eaf5c028db3, type: 3}
+      propertyPath: muzzle
+      value: 
+      objectReference: {fileID: 1140091180}
+    - target: {fileID: 611797521086465749, guid: 2bcbb7500a891274ab893eaf5c028db3, type: 3}
+      propertyPath: bulletObj
+      value: 
+      objectReference: {fileID: 1548784170395063139, guid: 3b86f00c3c96cfc43bde2a3886234bf7, type: 3}
     - target: {fileID: 753000949937389072, guid: 2bcbb7500a891274ab893eaf5c028db3, type: 3}
       propertyPath: moveSpeed
       value: 3
@@ -4090,15 +4108,23 @@ PrefabInstance:
       objectReference: {fileID: 519420031}
     - target: {fileID: 6822988937946351932, guid: fca8d11eb8a48c44cbbbff7f7512431a, type: 3}
       propertyPath: m_Name
-      value: Pause Menu (Canvas)
+      value: UI (Canvas)
       objectReference: {fileID: 0}
     - target: {fileID: 7450366754008862807, guid: fca8d11eb8a48c44cbbbff7f7512431a, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Target
       value: 
+      objectReference: {fileID: 614452756}
+    - target: {fileID: 7450366754008862807, guid: fca8d11eb8a48c44cbbbff7f7512431a, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_MethodName
+      value: Play
       objectReference: {fileID: 0}
     - target: {fileID: 8571143648966099805, guid: fca8d11eb8a48c44cbbbff7f7512431a, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Target
       value: 
+      objectReference: {fileID: 614452756}
+    - target: {fileID: 8571143648966099805, guid: fca8d11eb8a48c44cbbbff7f7512431a, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_MethodName
+      value: Play
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
