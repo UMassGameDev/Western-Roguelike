@@ -21,11 +21,11 @@ public class PlayerMovement : MonoBehaviour
     {
         moveDir = Vector3.zero;
 
-        if (Input.GetKey(KeyCode.UpArrow)) { moveDir.y += 1; }
-        if (Input.GetKey(KeyCode.LeftArrow)) { moveDir.x -= 1; }
-        if (Input.GetKey(KeyCode.DownArrow)) { moveDir.y -= 1; }
-        if (Input.GetKey(KeyCode.RightArrow)) { moveDir.x += 1; }
-        
+        if (Input.GetKey(KeyCode.UpArrow) || Input.GetKey(KeyCode.W)) { moveDir.y += 1; }
+        if (Input.GetKey(KeyCode.LeftArrow) || Input.GetKey(KeyCode.A)) { moveDir.x -= 1; }
+        if (Input.GetKey(KeyCode.DownArrow) || Input.GetKey(KeyCode.S)) { moveDir.y -= 1; }
+        if (Input.GetKey(KeyCode.RightArrow) || Input.GetKey(KeyCode.D)) { moveDir.x += 1; }
+
         /*
         bool playerIsMoving = moveDir.sqrMagnitude > 0.01f;
         if (playerIsMoving && Time.timeScale != 0)  // Time.timeScale != 0 is needed because otherwise rotating is not bound by time.
