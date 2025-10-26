@@ -288,7 +288,7 @@ public class DungeonGenerator : MonoBehaviour
     }
 
     //~(RemoveDeadEnds)~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
+    // Repeatedly remove all floor tiles with only 0 or 1 neighboring floor tiles until no dead ends are left.
     void RemoveDeadEnds()
     {
         bool done = false;
@@ -299,16 +299,16 @@ public class DungeonGenerator : MonoBehaviour
             {
                 for (int y = 1; y < dungeonHeight - 1; y++)
                 {
-                    if (tiles[x, y] == 0) { continue; }
+                    if (tiles[x, y] != Tile.Floor) { continue; }
                     int exits = 0;
                     foreach (var dir in CardinalDirections)
                     {
-                        if (tiles[x + dir.x, y + dir.y] != 0) { exits++; }
+                        if (tiles[x + dir.x, y + dir.y] == Tile.Floor) { exits++; }
                     }
-                    if (exits != 1) { continue; }
+                    if (exits != 0 && exits != 1) { continue; }
 
                     done = false;
-                    tiles[x, y] = 0;
+                    tiles[x, y] = Tile.Wall;
                 }
             }
         }
