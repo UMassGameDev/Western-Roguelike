@@ -1,3 +1,16 @@
+/*******************************************************
+* Script:      DungeonGenerator.cs
+* Author(s):   Nicholas Johnson, Alex Art
+* 
+* Description:
+*    This script generates a random roguelike dungeon from a set of tiles
+*    on a tilemap.
+* 
+* Notes:
+*    Dungeon Generator modeled after the generator found here, translated from DART to C#:
+*    https://github.com/munificent/hauberk/blob/db360d9efa714efb6d937c31953ef849c7394a39/lib/src/content/dungeon.dart
+*******************************************************/
+
 using System.Data;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,8 +19,6 @@ using UnityEngine;
 using UnityEngine.Tilemaps;
 using System.Numerics;
 
-// Dungeon Generator modeled after the generator found here, translated from DART to C#:
-// https://github.com/munificent/hauberk/blob/db360d9efa714efb6d937c31953ef849c7394a39/lib/src/content/dungeon.dart
 public class DungeonGenerator : MonoBehaviour
 {
     private static readonly Vector2Int[] CardinalDirections = new Vector2Int[]
