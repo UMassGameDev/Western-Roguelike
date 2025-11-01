@@ -24,6 +24,8 @@ public class PlayerShoot : MonoBehaviour
     [Header("Shooting")]
     [SerializeField, Tooltip("The bullet prefab.")]
     GameObject bulletObj;
+    [SerializeField, Tooltip("The muzzle flare prefab.")]
+    GameObject flareObj;
     [SerializeField, Tooltip("Where the bullet is spawned.")]
     Transform muzzle;
     [SerializeField, Tooltip("Time until next bullet can be shot."), Min(0f)]
@@ -56,6 +58,8 @@ public class PlayerShoot : MonoBehaviour
 
     void Shoot()
     {
+        GameObject flare = Instantiate(flareObj, muzzle.position, muzzle.rotation);
+        Destroy(flare, 0.1f);
         GameObject bullet = Instantiate(bulletObj, muzzle.position, muzzle.rotation);
         Rigidbody2D rb = bullet.GetComponent<Rigidbody2D>();
         rb.AddForce(-muzzle.up * bulletForce, ForceMode2D.Impulse);
