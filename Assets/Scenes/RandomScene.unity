@@ -373,7 +373,7 @@ Rigidbody2D:
   m_UseAutoMass: 0
   m_Mass: 1
   m_LinearDamping: 0
-  m_AngularDamping: 0.05
+  m_AngularDamping: 0
   m_GravityScale: 1
   m_Material: {fileID: 0}
   m_IncludeLayers:
@@ -384,7 +384,7 @@ Rigidbody2D:
     m_Bits: 0
   m_Interpolate: 0
   m_SleepingMode: 1
-  m_CollisionDetection: 0
+  m_CollisionDetection: 1
   m_Constraints: 7
 --- !u!19719996 &598603762
 TilemapCollider2D:
@@ -652,6 +652,11 @@ Transform:
   - {fileID: 615603968}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1000121291 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 784564846793530134, guid: fca8d11eb8a48c44cbbbff7f7512431a, type: 3}
+  m_PrefabInstance: {fileID: 1313439437}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1313439437
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -664,6 +669,10 @@ PrefabInstance:
       propertyPath: m_PlayOnAwake
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4846852234205433200, guid: fca8d11eb8a48c44cbbbff7f7512431a, type: 3}
+      propertyPath: overlayUI
+      value: 
+      objectReference: {fileID: 1000121291}
     - target: {fileID: 5705442415838829115, guid: fca8d11eb8a48c44cbbbff7f7512431a, type: 3}
       propertyPath: m_Pivot.x
       value: 0
@@ -746,7 +755,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6822988937946351932, guid: fca8d11eb8a48c44cbbbff7f7512431a, type: 3}
       propertyPath: m_Name
-      value: Pause Menu (Canvas)
+      value: UI (Canvas)
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
