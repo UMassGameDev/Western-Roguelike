@@ -1,12 +1,33 @@
+/*******************************************************
+* Script:      PlayerShoot.cs
+* Author(s):   Nicholas Johnson
+* 
+* Description:
+*    This script handles player shooting.
+*******************************************************/
+
 using UnityEngine;
 
+/// <summary>
+///     PlayerShoot is a component that allows shooting as if the attached object
+///     was the player. It should only be attached to the player.
+/// </summary>
+/// <remarks> 
+///     As of 11/1/2025, this script assumes a fixed weapon; the revolver. This script
+///     should be modified to handle other weapons smoothly when the time comes to implement them.
+/// </remarks>
+/// <seealso cref="PlayerAim">How the player aims.</seealso>
+/// <seealso cref="Bullet">Bullet currently fired.</seealso>
 public class PlayerShoot : MonoBehaviour
 {
+    // Editor variables:
     [Header("Shooting")]
     [SerializeField, Tooltip("The bullet prefab.")]
     GameObject bulletObj;
     [SerializeField, Tooltip("Where the bullet is spawned.")]
     Transform muzzle;
+    [SerializeField, Tooltip("Time until next bullet can be shot."), Min(0f)]
+    float cooldown = 0.5f;
 
     [Header("Audio")]
     [SerializeField, Tooltip("The sound played on Shoot().")]
@@ -14,38 +35,34 @@ public class PlayerShoot : MonoBehaviour
     [SerializeField, Tooltip("Where <shootSound> is played.")]
     AudioSource audioSource;
 
-    const float cooldown = 0.5f;
+    // Internal variables:
     float lastShotTime;
+    float bulletForce = 40f;
 
+    // On each update, Shoot() if mouse is clicked and gun is not on cooldown.
     void Update()
     {
+        // Calculate conditions neccesary for a Shoot() to occur.
         bool mouseClicked = Input.GetMouseButton(0);
         bool onCooldown = Time.time <= lastShotTime + cooldown;
-        bool canShoot = mouseClicked && !onCooldown;
-        if (canShoot)
+
+        // If mouse was clicked and Shoot() is not on cooldown, shoot.
+        if (mouseClicked && !onCooldown)
         {
             Shoot();
-            lastShotTime = Time.time;
+            lastShotTime = Time.time;  // Reset cooldown.
         }
     }
 
     void Shoot()
     {
-        Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        Vector2 direction = mousePos - muzzle.position;
-
-        GameObject bullet = Instantiate(bulletObj, muzzle.position, Quaternion.identity);
-
-        float angle = CalculateAngle(direction);
-        bullet.transform.rotation = RotateBy(angle);
-
-        bullet.GetComponent<Bullet>().Initialize(direction);
+        GameObject bullet = Instantiate(bulletObj, muzzle.position, muzzle.rotation);
+        Rigidbody2D rb = bullet.GetComponent<Rigidbody2D>();
+        rb.AddForce(-muzzle.up * bulletForce, ForceMode2D.Impulse);
 
         bool soundInitialized = audioSource != null && shootSound != null;
         if (soundInitialized) { PlaySound(); }
     }
 
-    float CalculateAngle(Vector2 dir) => Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
-    Quaternion RotateBy(float angle) => Quaternion.Euler(0, 0, angle + 90);
     void PlaySound() => audioSource.PlayOneShot(shootSound);
 }
