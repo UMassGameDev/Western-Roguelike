@@ -7,7 +7,8 @@ public class PauseMenu : MonoBehaviour
 {
     [SerializeField, Tooltip("The pause menu panel.")]
     private GameObject pauseMenuUI;
-
+    [SerializeField, Tooltip("The overlay panel.")]
+    private GameObject overlayUI;
     public static bool isPaused = false;
     void Awake()
     {
@@ -27,6 +28,7 @@ public class PauseMenu : MonoBehaviour
     private void Resume()
     {
         pauseMenuUI.SetActive(false);
+        overlayUI.SetActive(true);
         Time.timeScale = 1f;
         isPaused = false;
         Debug.Log("Time restored!");
@@ -36,6 +38,7 @@ public class PauseMenu : MonoBehaviour
     private void Pause()
     {
         pauseMenuUI.SetActive(true);
+        overlayUI.SetActive(false);
         Time.timeScale = 0f;
         isPaused = true;
         Debug.Log("Time paused!");
