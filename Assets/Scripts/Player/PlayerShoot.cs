@@ -39,7 +39,7 @@ public class PlayerShoot : MonoBehaviour
 
     // Internal variables:
     float lastShotTime;
-    float bulletForce = 40f;
+    float bulletForce = 60f;
 
     // On each update, Shoot() if mouse is clicked and gun is not on cooldown.
     void Update()

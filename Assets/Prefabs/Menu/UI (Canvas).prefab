@@ -787,6 +787,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   pauseMenuUI: {fileID: 8891108828372318031}
+  overlayUI: {fileID: 784564846793530134}
 --- !u!114 &6036723005187282554
 MonoBehaviour:
   m_ObjectHideFlags: 0
