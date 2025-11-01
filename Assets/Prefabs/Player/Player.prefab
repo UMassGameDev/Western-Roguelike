@@ -365,7 +365,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   bulletObj: {fileID: 1548784170395063139, guid: 3b86f00c3c96cfc43bde2a3886234bf7, type: 3}
+  flareObj: {fileID: 5832922978901417772, guid: fc6664f3f32ca0340b0444a806874dd5, type: 3}
   muzzle: {fileID: 4455725133419971136}
   cooldown: 0.5
-  shootSound: {fileID: 8300000, guid: 63e2aa4815837714a9c0c30e2599646c, type: 3}
+  shootSound: {fileID: 8300000, guid: cac629d478abb654bafd3f1c39acc3e7, type: 3}
   audioSource: {fileID: 7551574136678995364}
