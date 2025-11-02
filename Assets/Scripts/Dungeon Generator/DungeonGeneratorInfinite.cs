@@ -44,6 +44,10 @@ public class DungeonGeneratorInfinite : MonoBehaviour
     [SerializeField, Tooltip("Tile used to represent floors.")]
     private TileBase floorTile;
 
+    [Header("Parameters:")]
+    [SerializeField, Tooltip("Likelihood for each tile to attempt to generate a room, 0-100%. Note that failed attempts are common."), Range(0, 1)]
+    private float roomDensity = 0.05f;
+
     // Seed works as an offset rather than an actual seed because Mathf.PerlinNoise does not support seeding
     private int seedX;
     private int seedY;
@@ -64,9 +68,12 @@ public class DungeonGeneratorInfinite : MonoBehaviour
         int cameraTileWidth = 20;
         int cameraTileHeight = 12;
 
-        for (int y = playerTileY - cameraTileHeight / 2; y <= playerTileY + cameraTileHeight / 2; y++) {
-            for (int x = playerTileX - cameraTileWidth / 2; x <= playerTileX + cameraTileWidth / 2; x++) {
-                if (GetTile(x, y) == null) { // Avoids generating same position twice
+        for (int y = playerTileY - cameraTileHeight / 2; y <= playerTileY + cameraTileHeight / 2; y++)
+        {
+            for (int x = playerTileX - cameraTileWidth / 2; x <= playerTileX + cameraTileWidth / 2; x++)
+            {
+                if (GetTile(x, y) == null) // Avoids generating same position twice
+                {
                     SetTile(x, y, GenerateTile(x, y));
                 }
             }
@@ -88,30 +95,149 @@ public class DungeonGeneratorInfinite : MonoBehaviour
     }
 
     //~(SetTile)~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // Returns which tile should be generated at the passed coordinate
+    // Returns which tile should be generated at the passed coordinate.
     private TileBase GenerateTile(int x, int y)
     {
-        float tileNoise = Mathf.PerlinNoise(x * 0.05f + seedX, y * 0.05f + seedY);
-        //Debug.Log(tileNoise * 1000000 % 1); // Random value between 0 and 1 instead of smooth value
-        if (tileNoise < 0.5)
+        // This should be an odd number
+        int maxRoomSize = 9;
+
+        // Rooms generate on odd tiles, so find the nearest odd tiles
+        int prevOddX = x;
+        int prevOddY = y;
+        int nextOddX = x;
+        int nextOddY = y;
+        if (x % 2 == 0) { --prevOddX; ++nextOddX; }
+        if (y % 2 == 0) { --prevOddY; ++nextOddY; }
+
+        // Search the area around the current tile for buildings:
+        // - Buildings only generate on odd tiles
+        // - Buildings only generate if tileNoise for that tile is less than roomDensity
+        // - If two or more buildings overlap, the building with the greatest tileNoise within a radius of maxRoomSize is the one that gets generated
+        float maxRoomValue = 0; // Used for finding the building with the greatest tileNoise
+                                // Stays 0 if no buildings are found
+        int roomX = 0; // Position of the room with the greatest tileNoise
+        int roomY = 0;
+        for (int ry = prevOddY - maxRoomSize + 1; ry <= nextOddY; ry += 2)
         {
-            return floorTile;
+            for (int rx = prevOddX - maxRoomSize + 1; rx <= nextOddX; rx += 2)
+            {
+                float tileNoise = GetRandomNoise(rx, ry);
+                if (tileNoise < roomDensity && maxRoomValue < tileNoise)
+                {
+                    maxRoomValue = tileNoise;
+                    roomX = rx;
+                    roomY = ry;
+                }
+            }
         }
-        else
+
+        // Before placing the building, ensure that no other buildings have a chance of overlapping with it
+        bool validPlacement = true;
+        for (int ry = roomY - maxRoomSize + 1; ry < roomY + maxRoomSize; ry += 2)
+        {
+            for (int rx = roomX - maxRoomSize + 1; rx < roomX + maxRoomSize; rx += 2)
+            {
+                float tileNoise = GetRandomNoise(rx, ry);
+                if (tileNoise < roomDensity && maxRoomValue < tileNoise)
+                {
+                    validPlacement = false;
+                    break;
+                }
+            }
+
+            // Break out of the outer loop as well
+            if (!validPlacement)
+            {
+                break;
+            }
+        }
+
+        // Room sizes should be odd
+        Vector2Int roomSize = GetRoomSize(maxRoomValue * 1000000 % 1);
+
+        // Fill the tile with wall if:
+        // - A building was found
+        // - The found building has no chance of overlapping with any other building
+        // - The tile at (x, y) is within the bounds of the room
+        if (maxRoomValue > 0 && validPlacement && roomX <= x && roomX + roomSize.x > x && roomY <= y && roomY + roomSize.y > y)
         {
             return wallTile;
         }
+        else
+        {
+            return floorTile;
+        }
+    }
+
+    //~(GetRandomNoise)~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // Return random value between 0 and 1 based on the coordinate.
+    // Mathf.PerlinNoise does not support actual seeding, so seedX and seedY are used as an offset.
+    private float GetRandomNoise(int x, int y)
+    {
+        return Mathf.PerlinNoise(x * 0.05f + seedX, y * 0.05f + seedY) * 1000000 % 1;
+    }
+
+    //~(GetRoomSize)~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // Return random room size based on random value between 0 and 1.
+    // Room sizes should be odd.
+    private Vector2Int GetRoomSize(float randomValue)
+    {
+        Vector2Int roomSize;
+
+        if (randomValue < 0.1f)
+        {
+            roomSize = new Vector2Int(5, 5);
+        }
+        else if (randomValue < 0.2f)
+        {
+            roomSize = new Vector2Int(5, 7);
+        }
+        else if (randomValue < 0.3f)
+        {
+            roomSize = new Vector2Int(5, 9);
+        }
+        else if (randomValue < 0.4f)
+        {
+            roomSize = new Vector2Int(7, 5);
+        }
+        else if (randomValue < 0.5f)
+        {
+            roomSize = new Vector2Int(7, 7);
+        }
+        else if (randomValue < 0.6f)
+        {
+            roomSize = new Vector2Int(7, 9);
+        }
+        else if (randomValue < 0.7f)
+        {
+            roomSize = new Vector2Int(9, 5);
+        }
+        else if (randomValue < 0.8f)
+        {
+            roomSize = new Vector2Int(9, 7);
+        }
+        else
+        {
+            roomSize = new Vector2Int(9, 9);
+        }
+
+        return roomSize;
     }
 
     //~(PlacePlayer)~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    
+    // Find a floor tile to spawn the player at.
     private void PlacePlayer()
     {
-        Vector2Int spawnPos = new Vector2Int(0, 0);
+        int spawnX = 0;
+        int spawnY = 0;
+        while (GenerateTile(spawnX, spawnY) != floorTile)
+        {
+            ++spawnX;
+        }
 
         if (playerInstance != null)
         {
-            playerInstance.transform.position = new UnityEngine.Vector3(spawnPos.x + 0.5f, spawnPos.y + 0.5f, -1);
+            playerInstance.transform.position = new UnityEngine.Vector3(spawnX + 0.5f, spawnY + 0.5f, -1);
         }
         else
         {
