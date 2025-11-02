@@ -1,6 +1,6 @@
 /*******************************************************
 * Script:      DungeonGenerator.cs
-* Author(s):   Nicholas Johnson, Alex Art
+* Author(s):   Nicholas Johnson, Alexander Art
 * 
 * Description:
 *    This script generates a random roguelike dungeon from a set of tiles
