@@ -81,14 +81,14 @@ public class DungeonGeneratorInfinite : MonoBehaviour
     }
 
     //~(GetTile)~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // Get tilemap tile
+    // Gets tilemap tile
     private TileBase GetTile(int x, int y)
     {
         return tilemap.GetTile(new Vector3Int(x, y, 0));
     }
 
     //~(SetTile)~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // Set tilemap tile
+    // Sets tilemap tile
     private void SetTile(int x, int y, TileBase tileAsset)
     {
         tilemap.SetTile(new Vector3Int(x, y, 0), tileAsset);
@@ -97,6 +97,46 @@ public class DungeonGeneratorInfinite : MonoBehaviour
     //~(SetTile)~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Returns which tile should be generated at the passed coordinate.
     private TileBase GenerateTile(int x, int y)
+    {
+        if (GetBiome(x, y) == 1 || GetRoom(x, y) == 1)
+        {
+            return wallTile;
+        }
+        else
+        {
+            return floorTile;
+        }
+    }
+
+    //~(GetRandomNoise)~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // Returns random value between 0 and 1 based on the coordinate.
+    // Mathf.PerlinNoise does not support actual seeding, so seedX and seedY are used as an offset.
+    private float GetRandomNoise(int x, int y)
+    {
+        return Mathf.PerlinNoise(x * 0.05f + seedX, y * 0.05f + seedY) * 1000000 % 1;
+    }
+
+    //~(GetBiome)~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // Returns which biome to generate at the passed coordinate.
+    // 0 for desert plains and 1 for plateau.
+    private int GetBiome(int x, int y)
+    {
+        float smoothNoise = Mathf.PerlinNoise(x * 0.05f + seedX, y * 0.05f + seedY);
+
+        if (smoothNoise < 0.55f)
+        {
+            return 0;
+        }
+        else
+        {
+            return 1;
+        }
+    }
+
+    //~(GetRoom)~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // Determines if a room should be generated at the passed coordinate.
+    // Returns 0 for no room and 1 for room.
+    private int GetRoom(int x, int y)
     {
         // This should be an odd number
         int maxRoomSize = 9;
@@ -155,30 +195,43 @@ public class DungeonGeneratorInfinite : MonoBehaviour
         // Room sizes should be odd
         Vector2Int roomSize = GetRoomSize(maxRoomValue * 1000000 % 1);
 
+    
+        // Before placing the building, ensure that it does not generate in a plateau biome
+        for (int ry = roomY - 1; ry < roomY + roomSize.y + 1; ry++)
+        {
+            for (int rx = roomX - 1; rx < roomX + roomSize.x + 1; rx++)
+            {
+                if (GetBiome(rx, ry) == 1)
+                {
+                    validPlacement = false;
+                    break;
+                }
+            }
+
+            // Break out of the outer loop as well
+            if (!validPlacement)
+            {
+                break;
+            }
+        }
+
         // Fill the tile with wall if:
         // - A building was found
         // - The found building has no chance of overlapping with any other building
+        // - The found building is not touching a plateau biome
         // - The tile at (x, y) is within the bounds of the room
         if (maxRoomValue > 0 && validPlacement && roomX <= x && roomX + roomSize.x > x && roomY <= y && roomY + roomSize.y > y)
         {
-            return wallTile;
+            return 1;
         }
         else
         {
-            return floorTile;
+            return 0;
         }
     }
 
-    //~(GetRandomNoise)~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // Return random value between 0 and 1 based on the coordinate.
-    // Mathf.PerlinNoise does not support actual seeding, so seedX and seedY are used as an offset.
-    private float GetRandomNoise(int x, int y)
-    {
-        return Mathf.PerlinNoise(x * 0.05f + seedX, y * 0.05f + seedY) * 1000000 % 1;
-    }
-
     //~(GetRoomSize)~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // Return random room size based on random value between 0 and 1.
+    // Returns random room size based on random value between 0 and 1.
     // Room sizes should be odd.
     private Vector2Int GetRoomSize(float randomValue)
     {
@@ -225,7 +278,7 @@ public class DungeonGeneratorInfinite : MonoBehaviour
     }
 
     //~(PlacePlayer)~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // Find a floor tile to spawn the player at.
+    // Finds a floor tile to spawn the player at.
     private void PlacePlayer()
     {
         int spawnX = 0;
