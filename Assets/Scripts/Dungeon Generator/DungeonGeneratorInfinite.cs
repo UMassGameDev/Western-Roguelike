@@ -43,10 +43,14 @@ public class DungeonGeneratorInfinite : MonoBehaviour
     private TileBase wallTile;
     [SerializeField, Tooltip("Tile used to represent floors.")]
     private TileBase floorTile;
+    [SerializeField, Tooltip("Tile used to represent cacti.")]
+    private TileBase cactusTile;
 
     [Header("Parameters:")]
     [SerializeField, Tooltip("Likelihood for each tile to attempt to generate a room, 0-100%. Note that failed attempts are common."), Range(0, 1)]
     private float roomDensity = 0.05f;
+    [SerializeField, Tooltip("Percentage of floor tiles that generate cacti."), Range(0, 1)]
+    private float cactusPercentage = 0.01f;
 
     // Seed works as an offset rather than an actual seed because Mathf.PerlinNoise does not support seeding
     private int seedX;
@@ -104,7 +108,15 @@ public class DungeonGeneratorInfinite : MonoBehaviour
         }
         else
         {
-            return floorTile;
+            // Floor tiles have a chance of generating cacti
+            if (GetRandomNoise2(x, y) < cactusPercentage)
+            {
+                return cactusTile;
+            }
+            else
+            {
+                return floorTile;
+            }
         }
     }
 
@@ -114,6 +126,13 @@ public class DungeonGeneratorInfinite : MonoBehaviour
     private float GetRandomNoise(int x, int y)
     {
         return Mathf.PerlinNoise(x * 0.05f + seedX, y * 0.05f + seedY) * 1000000 % 1;
+    }
+
+    //~(GetRandomNoise2)~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // Like GetRandomNoise, but even more random.
+    private float GetRandomNoise2(int x, int y)
+    {
+        return GetRandomNoise((int)Math.Pow(GetRandomNoise(x * x, y * y) * 1000, 2), (int)Math.Pow(GetRandomNoise(x, y) * 1000, 2));
     }
 
     //~(GetBiome)~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
