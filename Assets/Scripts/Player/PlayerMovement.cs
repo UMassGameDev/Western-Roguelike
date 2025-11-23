@@ -4,11 +4,19 @@ using UnityEngine;
 public class PlayerMovement : MonoBehaviour
 {
     // This [] is an attribute, attributes mostly provide additional info in the editor.
-    [SerializeField, Tooltip("Distance moved per frame in meters per second")]
+    [SerializeField, Tooltip("Distance moved per frame in meters per second.")]
     private float moveSpeed = 5f;
+    [SerializeField, Tooltip("Move Speed multiplier when the player is touching a cactus.")]
+    private float cactusDebuff = 0.5f;
 
     private Rigidbody2D playerRB;
     private Vector3 moveDir;
+
+    // List of trigger colliders objects overlapped with the player 
+    private List<Collider2D> currentColliders = new List<Collider2D>();
+
+    // The player is slowed down when colliding with a cactus
+    private bool onCactus = false;
 
     // Gets the <playerRB>:
     void Awake()
@@ -26,6 +34,16 @@ public class PlayerMovement : MonoBehaviour
         if (Input.GetKey(KeyCode.DownArrow) || Input.GetKey(KeyCode.S)) { moveDir.y -= 1; }
         if (Input.GetKey(KeyCode.RightArrow) || Input.GetKey(KeyCode.D)) { moveDir.x += 1; }
 
+        // Check for overlap with cacti to update onCactus variable
+        onCactus = false;
+        foreach (Collider2D collider in currentColliders)
+        {
+            if (collider.gameObject.GetComponent<Cactus>() != null)
+            {
+                onCactus = true;
+            }
+        }
+
         /*
         bool playerIsMoving = moveDir.sqrMagnitude > 0.01f;
         if (playerIsMoving && Time.timeScale != 0)  // Time.timeScale != 0 is needed because otherwise rotating is not bound by time.
@@ -37,12 +55,20 @@ public class PlayerMovement : MonoBehaviour
     }
 
     // Fixed update is just Update() for physics interactions.
-    // Moves the sprite by <moveSpeed> * <dt> every frame:
+    // Moves the sprite by <effectiveMovementSpeed> * <dt> every frame:
     void FixedUpdate()
     {
-        float moveSpeedDt = moveSpeed * Time.fixedDeltaTime;
+        // Calculate effective movement speed for if there are movement buffs/debuffs applied
+        float effectiveMovementSpeed = moveSpeed;
+        if (onCactus) { effectiveMovementSpeed *= cactusDebuff; }
+
+        float moveSpeedDt = effectiveMovementSpeed * Time.fixedDeltaTime;
         playerRB.MovePosition(playerRB.position + (Vector2)(moveDir * moveSpeedDt));
     }
+
+    // Track all currently overlapped trigger colliders
+    private void OnTriggerEnter2D(Collider2D collider) { currentColliders.Add(collider); }
+    private void OnTriggerExit2D(Collider2D collider) { currentColliders.Remove(collider); }
 
     //~(Helper Methods)~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

@@ -43,8 +43,10 @@ public class DungeonGeneratorInfinite : MonoBehaviour
     private TileBase wallTile;
     [SerializeField, Tooltip("Tile used to represent floors.")]
     private TileBase floorTile;
-    [SerializeField, Tooltip("Tile used to represent cacti.")]
-    private TileBase cactusTile;
+
+    [Header("Prefabs:")]
+    [SerializeField, Tooltip("Prefab for cacti.")]
+    private GameObject cactusPrefab;
 
     [Header("Parameters:")]
     [SerializeField, Tooltip("Likelihood for each tile to attempt to generate a room, 0-100%. Note that failed attempts are common."), Range(0, 1)]
@@ -78,7 +80,14 @@ public class DungeonGeneratorInfinite : MonoBehaviour
             {
                 if (GetTile(x, y) == null) // Avoids generating same position twice
                 {
+                    // Generate and set the tile
                     SetTile(x, y, GenerateTile(x, y));
+
+                    // Floor tiles have a chance of generating a cactus
+                    if (GetTile(x, y) == floorTile && GetRandomNoise2(x, y) < cactusPercentage)
+                    {
+                        Instantiate(cactusPrefab, new UnityEngine.Vector3(x + 0.5f, y + 0.5f, -0.5f), UnityEngine.Quaternion.identity);
+                    }
                 }
             }
         }
@@ -108,15 +117,7 @@ public class DungeonGeneratorInfinite : MonoBehaviour
         }
         else
         {
-            // Floor tiles have a chance of generating cacti
-            if (GetRandomNoise2(x, y) < cactusPercentage)
-            {
-                return cactusTile;
-            }
-            else
-            {
-                return floorTile;
-            }
+            return floorTile;
         }
     }
 
