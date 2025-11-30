@@ -173,6 +173,7 @@ GameObject:
   - component: {fileID: 753000949937389072}
   - component: {fileID: 5247424659922260330}
   - component: {fileID: 844629399406508719}
+  - component: {fileID: 6845731366923069349}
   - component: {fileID: 801197960613546519}
   - component: {fileID: -3960395064143150362}
   m_Layer: 3
@@ -267,6 +268,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   moveSpeed: 5
+  cactusDebuff: 0.5
 --- !u!61 &5247424659922260330
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -340,6 +342,22 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 1
   m_Constraints: 4
+--- !u!114 &6845731366923069349
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6622966133622132808}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0651d678e792c234bb3f17352c5a85f8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxHealth: 3
+  OnDeath:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!114 &801197960613546519
 MonoBehaviour:
   m_ObjectHideFlags: 0
