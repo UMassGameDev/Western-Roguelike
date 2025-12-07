@@ -355,6 +355,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxHealth: 3
+  OnHealthChanged:
+    m_PersistentCalls:
+      m_Calls: []
   OnDeath:
     m_PersistentCalls:
       m_Calls: []
@@ -386,5 +389,6 @@ MonoBehaviour:
   flareObj: {fileID: 5832922978901417772, guid: fc6664f3f32ca0340b0444a806874dd5, type: 3}
   muzzle: {fileID: 4455725133419971136}
   cooldown: 0.5
+  bulletSpeed: 60
   shootSound: {fileID: 8300000, guid: cac629d478abb654bafd3f1c39acc3e7, type: 3}
   audioSource: {fileID: 7551574136678995364}

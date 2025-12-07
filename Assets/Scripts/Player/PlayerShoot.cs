@@ -30,6 +30,8 @@ public class PlayerShoot : MonoBehaviour
     Transform muzzle;
     [SerializeField, Tooltip("Time until next bullet can be shot."), Min(0f)]
     float cooldown = 0.5f;
+    [SerializeField, Tooltip("Bullet speed.")] 
+    float bulletSpeed = 60f;
 
     [Header("Audio")]
     [SerializeField, Tooltip("The sound played on Shoot().")]
@@ -39,7 +41,6 @@ public class PlayerShoot : MonoBehaviour
 
     // Internal variables:
     float lastShotTime;
-    float bulletForce = 60f;
 
     // On each update, Shoot() if mouse is clicked and gun is not on cooldown.
     void Update()
@@ -60,9 +61,10 @@ public class PlayerShoot : MonoBehaviour
     {
         GameObject flare = Instantiate(flareObj, muzzle.position, muzzle.rotation);
         Destroy(flare, 0.1f);
-        GameObject bullet = Instantiate(bulletObj, muzzle.position, muzzle.rotation);
-        Rigidbody2D rb = bullet.GetComponent<Rigidbody2D>();
-        rb.AddForce(-muzzle.up * bulletForce, ForceMode2D.Impulse);
+        GameObject bullet = Instantiate(bulletObj, transform.position, muzzle.rotation);
+        Bullet bulletScript = bullet.GetComponent<Bullet>();
+        bulletScript.SetVelocity(-muzzle.up * bulletSpeed);
+        bulletScript.SetPlayerBullet(true);
 
         bool soundInitialized = audioSource != null && shootSound != null;
         if (soundInitialized) { PlaySound(); }

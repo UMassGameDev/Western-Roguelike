@@ -3,7 +3,7 @@
 * Author(s):   Nicholas Johnson, Alexander Art
 * 
 * Description:
-*    This script handles the player's bullets'
+*    This script handles bullet
 *    behaviour on collision.
 *******************************************************/
 
@@ -18,34 +18,61 @@ public class Bullet : MonoBehaviour
     [SerializeField, Tooltip("Hit effect on collision.")] 
     private GameObject hitEffect;
 
-    int counter = 0; // What does this do?
-    
-    //~(OnCollisionEnter2D)~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // Collision with a solid object
-    private void OnCollisionEnter2D(Collision2D collision)
+    // If the bullet belongs to the player, playerBullet is true, and the player is immune to the bullet.
+    private bool playerBullet = false;
+
+    private Vector3 velocity;
+
+    void FixedUpdate()
     {
-        // Show debug info
-        Debug.Log($"Bullet hit {collision.gameObject.name} at {collision.contacts[0].point}");
-        Debug.DrawLine(transform.position, collision.contacts[0].point, Color.red, 100f);
+        // Raycast between current position and next position
+        RaycastHit2D[] hits = Physics2D.RaycastAll(this.transform.position, velocity.normalized, (velocity * Time.fixedDeltaTime).magnitude);
 
-        // Temporarily instantiate the hit effect
-        GameObject effect = Instantiate(hitEffect, transform.position, Quaternion.identity);
-        Destroy(effect, 0.1f);
+        // In order of what is hit first
+        foreach (RaycastHit2D hit in hits)
+        {
+            // If bullet hit non-trigger collider (excluding the player if playerBullet is true)
+            if (!hit.collider.isTrigger && (!playerBullet || hit.transform.GetComponent<PlayerShoot>() == null))
+            {
+                // Show debug info
+                Debug.Log($"Bullet hit {hit.collider.gameObject.name} at {hit.point}");
+                Debug.DrawLine(this.transform.position, hit.point, Color.red, 100f);
 
-        // Delete the bullet
-        Destroy(gameObject);
+                // Temporarily instantiate the hit effect
+                GameObject effect = Instantiate(hitEffect, hit.point, Quaternion.identity);
+                Destroy(effect, 0.1f);
+
+                // Delete the bullet
+                Destroy(this.gameObject);
+            }
+            // If bullet hit trigger collider
+            else if (hit.collider.isTrigger)
+            {
+                // Check if the collided object has ObjectHealth
+                ObjectHealth objectHealth = hit.collider.gameObject.GetComponent<ObjectHealth>(); 
+                if (objectHealth != null)
+                {
+                    // Damage the collided object
+                    objectHealth.Damage(damage);
+                }
+            }
+        }
+
+        // Update position
+        this.transform.position += velocity * Time.fixedDeltaTime;
+    }
+    
+    //~(SetVelocity)~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // Bullet velocity is set from an external script
+    public void SetVelocity(Vector3 newVelocity)
+    {
+        velocity = newVelocity;
     }
 
-    //~(OnTriggerEnter2D)~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // Collision with a trigger
-    private void OnTriggerEnter2D(Collider2D collider)
+    //~(SetPlayerBullet)~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // The player is immune to their own bullets
+    public void SetPlayerBullet(bool isPlayerBullet)
     {
-        // Check if the collided object has ObjectHealth
-        ObjectHealth objectHealth = collider.gameObject.GetComponent<ObjectHealth>(); 
-        if (objectHealth != null)
-        {
-            // Damage the collided object
-            objectHealth.Damage(damage);
-        }
+        playerBullet = isPlayerBullet;
     }
 }

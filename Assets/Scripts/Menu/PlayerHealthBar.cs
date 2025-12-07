@@ -30,7 +30,7 @@ public class PlayerHealthBar : MonoBehaviour
     void Start()
     {
         // Search the scene for the player health script on the player
-        playerHealth = FindObjectOfType<PlayerHealth>();
+        playerHealth = FindAnyObjectByType<PlayerHealth>();
 
         // Add initial health unit to list of health units
         healthUnits.Add(initialHealthUnit);
