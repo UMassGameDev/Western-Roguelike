@@ -489,6 +489,7 @@ MonoBehaviour:
   wallTile: {fileID: 11400000, guid: 4a9f1fbea4cf6ff4d8dd3eeb179b557f, type: 2}
   floorTile: {fileID: 11400000, guid: 9558e05e3b7aaef4680eeb3fd7667c9d, type: 2}
   cactusPrefab: {fileID: 6993609107519788527, guid: a8a3420f6b8d245429633a7f399afb36, type: 3}
+  spawnAreaRadius: 7
   roomDensity: 0.05
   cactusPercentage: 0.01
 --- !u!1 &615603967

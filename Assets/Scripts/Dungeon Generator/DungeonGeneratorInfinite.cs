@@ -49,6 +49,8 @@ public class DungeonGeneratorInfinite : MonoBehaviour
     private GameObject cactusPrefab;
 
     [Header("Parameters:")]
+    [SerializeField, Tooltip("Radius around the spawn that terrain will not generate. This also determines the spawn building size.")]
+    private float spawnAreaRadius = 7f;
     [SerializeField, Tooltip("Likelihood for each tile to attempt to generate a room, 0-100%. Note that failed attempts are common."), Range(0, 1)]
     private float roomDensity = 0.05f;
     [SerializeField, Tooltip("Percentage of floor tiles that generate cacti."), Range(0, 1)]
@@ -60,8 +62,8 @@ public class DungeonGeneratorInfinite : MonoBehaviour
 
     void Awake()
     {
-        seedX = UnityEngine.Random.Range(1000, 1000000);
-        seedY = UnityEngine.Random.Range(1000, 1000000);
+        seedX = UnityEngine.Random.Range(100000, 200000);
+        seedY = UnityEngine.Random.Range(100000, 200000);
         PlacePlayer();
     }
 
@@ -83,8 +85,8 @@ public class DungeonGeneratorInfinite : MonoBehaviour
                     // Generate and set the tile
                     SetTile(x, y, GenerateTile(x, y));
 
-                    // Floor tiles have a chance of generating a cactus
-                    if (GetTile(x, y) == floorTile && GetRandomNoise2(x, y) < cactusPercentage)
+                    // Floor tiles outside the spawn area have a chance of generating a cactus
+                    if (GetTile(x, y) == floorTile && GetRandomNoise2(x, y) < cactusPercentage && Mathf.Sqrt(x * x + y * y) > spawnAreaRadius)
                     {
                         Instantiate(cactusPrefab, new UnityEngine.Vector3(x + 0.5f, y + 0.5f, -0.5f), UnityEngine.Quaternion.identity);
                     }
@@ -111,7 +113,7 @@ public class DungeonGeneratorInfinite : MonoBehaviour
     // Returns which tile should be generated at the passed coordinate.
     private TileBase GenerateTile(int x, int y)
     {
-        if (GetBiome(x, y) == 1 || GetRoom(x, y) == 1)
+        if (GetBiome(x, y) == 1 || GetSpawnBuilding(x, y) == 1 || GetRoom(x, y) == 1)
         {
             return wallTile;
         }
@@ -141,9 +143,15 @@ public class DungeonGeneratorInfinite : MonoBehaviour
     // 0 for desert plains and 1 for plateau.
     private int GetBiome(int x, int y)
     {
+        // Perlin noise for biome shapes
         float smoothNoise = Mathf.PerlinNoise(x * 0.05f + seedX, y * 0.05f + seedY);
 
-        if (smoothNoise < 0.55f)
+        // Ensure that everything from (0, 0) to spawnAreaRadius is plains,
+        // from spawnAreaRadius to 2 * spawnAreaRadius transitions linearly,
+        // and anything beyond 2 * spawnAreaRadius is unaffected.
+        float spawnBias = Mathf.Min(Mathf.Max(0, -Mathf.Sqrt(x * x + y * y) / spawnAreaRadius + 2), 1);
+
+        if (smoothNoise < 0.55f + spawnBias)
         {
             return 0;
         }
@@ -151,6 +159,27 @@ public class DungeonGeneratorInfinite : MonoBehaviour
         {
             return 1;
         }
+    }
+
+    //~(GetSpawnBuilding)~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // Returns true if the passed coordinate is part of the building in the spawn area.
+    private float GetSpawnBuilding(int x, int y)
+    {
+        int wallLength = (int) (Mathf.Sqrt(2f) / 2f * spawnAreaRadius - 1f);
+
+        // If the passed coordinate is part of the wall
+        if ((x == wallLength || x == -wallLength || y == wallLength || y == -wallLength) && x < wallLength + 1 && x > -wallLength - 1 && y < wallLength + 1 && y > -wallLength - 1)
+        {
+            // Leave doors
+            if (x != 0 && y != 0)
+            {
+                // Wall
+                return 1;
+            }
+        }
+
+        // Not wall
+        return 0;
     }
 
     //~(GetRoom)~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -215,13 +244,19 @@ public class DungeonGeneratorInfinite : MonoBehaviour
         // Room sizes should be odd
         Vector2Int roomSize = GetRoomSize(maxRoomValue * 1000000 % 1);
 
-    
-        // Before placing the building, ensure that it does not generate in a plateau biome
+        // Before placing the building, ensure:
+        // - It does not generate in a plateau biome
+        // - No part of it generates too close to spawn (0, 0)
         for (int ry = roomY - 1; ry < roomY + roomSize.y + 1; ry++)
         {
             for (int rx = roomX - 1; rx < roomX + roomSize.x + 1; rx++)
             {
                 if (GetBiome(rx, ry) == 1)
+                {
+                    validPlacement = false;
+                    break;
+                }
+                else if (Mathf.Sqrt(rx * rx + ry * ry) < spawnAreaRadius)
                 {
                     validPlacement = false;
                     break;
@@ -301,12 +336,15 @@ public class DungeonGeneratorInfinite : MonoBehaviour
     // Finds a floor tile to spawn the player at.
     private void PlacePlayer()
     {
+        // Player spawn location is always (0, 0)
         int spawnX = 0;
         int spawnY = 0;
+        /*
         while (GenerateTile(spawnX, spawnY) != floorTile)
         {
             ++spawnX;
         }
+        */
 
         if (playerInstance != null)
         {
