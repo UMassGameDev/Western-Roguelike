@@ -53,8 +53,10 @@ public class DungeonGeneratorInfinite : MonoBehaviour
     private float spawnAreaRadius = 7f;
     [SerializeField, Tooltip("Likelihood for each tile to attempt to generate a room, 0-100%. Note that failed attempts are common."), Range(0, 1)]
     private float roomDensity = 0.05f;
-    [SerializeField, Tooltip("Percentage of floor tiles that generate cacti."), Range(0, 1)]
-    private float cactusPercentage = 0.01f;
+    [SerializeField, Tooltip("Percentage of floor tiles in plains biomes that generate cacti."), Range(0, 1)]
+    private float plainsBiomeCactusPercentage = 0.01f;
+    [SerializeField, Tooltip("Percentage of floor tiles in cactus biomes that generate cacti."), Range(0, 1)]
+    private float cactusBiomeCactusPercentage = 0.5f;
 
     // Seed works as an offset rather than an actual seed because Mathf.PerlinNoise does not support seeding
     private int seedX;
@@ -86,9 +88,17 @@ public class DungeonGeneratorInfinite : MonoBehaviour
                     SetTile(x, y, GenerateTile(x, y));
 
                     // Floor tiles outside the spawn area have a chance of generating a cactus
-                    if (GetTile(x, y) == floorTile && GetRandomNoise2(x, y) < cactusPercentage && Mathf.Sqrt(x * x + y * y) > spawnAreaRadius)
+                    if (GetTile(x, y) == floorTile && Mathf.Sqrt(x * x + y * y) > spawnAreaRadius)
                     {
-                        Instantiate(cactusPrefab, new UnityEngine.Vector3(x + 0.5f, y + 0.5f, -0.5f), UnityEngine.Quaternion.identity);
+                        // The percentage of cactus generated per tile depends on the biome
+                        if (GetBiome(x, y) == 0 && GetRandomNoise2(x, y) < plainsBiomeCactusPercentage)
+                        {
+                            Instantiate(cactusPrefab, new UnityEngine.Vector3(x + 0.5f, y + 0.5f, -0.5f), UnityEngine.Quaternion.identity);
+                        }
+                        else if (GetBiome(x, y) == 2 && GetRandomNoise2(x, y) < cactusBiomeCactusPercentage)
+                        {
+                            Instantiate(cactusPrefab, new UnityEngine.Vector3(x + 0.5f, y + 0.5f, -0.5f), UnityEngine.Quaternion.identity);
+                        }
                     }
                 }
             }
@@ -140,24 +150,29 @@ public class DungeonGeneratorInfinite : MonoBehaviour
 
     //~(GetBiome)~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Returns which biome to generate at the passed coordinate.
-    // 0 for desert plains and 1 for plateau.
+    // 0 for desert plains, 1 for plateau, and 2 for cactus biome.
     private int GetBiome(int x, int y)
     {
         // Perlin noise for biome shapes
-        float smoothNoise = Mathf.PerlinNoise(x * 0.05f + seedX, y * 0.05f + seedY);
+        float smoothNoise1 = Mathf.PerlinNoise(x * 0.05f + seedX, y * 0.05f + seedY);
+        float smoothNoise2 = Mathf.PerlinNoise(x * 0.05f + seedY * 2, y * 0.05f + seedX);
 
-        // Ensure that everything from (0, 0) to spawnAreaRadius is plains,
+        // Ensure that everything from (0, 0) to spawnAreaRadius cannot be plateau,
         // from spawnAreaRadius to 2 * spawnAreaRadius transitions linearly,
         // and anything beyond 2 * spawnAreaRadius is unaffected.
         float spawnBias = Mathf.Min(Mathf.Max(0, -Mathf.Sqrt(x * x + y * y) / spawnAreaRadius + 2), 1);
 
-        if (smoothNoise < 0.55f + spawnBias)
+        if (smoothNoise1 > 0.55f + spawnBias)
         {
-            return 0;
+            return 1;
+        }
+        else if (smoothNoise1 > 0.5f && smoothNoise2 > 0.65f)
+        {
+            return 2;
         }
         else
         {
-            return 1;
+            return 0;
         }
     }
 

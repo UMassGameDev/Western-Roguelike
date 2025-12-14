@@ -491,7 +491,8 @@ MonoBehaviour:
   cactusPrefab: {fileID: 6993609107519788527, guid: a8a3420f6b8d245429633a7f399afb36, type: 3}
   spawnAreaRadius: 7
   roomDensity: 0.05
-  cactusPercentage: 0.01
+  plainsBiomeCactusPercentage: 0.01
+  cactusBiomeCactusPercentage: 0.5
 --- !u!1 &615603967
 GameObject:
   m_ObjectHideFlags: 0
