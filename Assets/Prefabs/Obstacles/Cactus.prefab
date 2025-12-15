@@ -152,8 +152,8 @@ MonoBehaviour:
   OnDeath:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 240266989219691585}
-        m_TargetAssemblyTypeName: Cactus, Assembly-CSharp
+      - m_Target: {fileID: -7637287691136696865}
+        m_TargetAssemblyTypeName: ObjectHealth, Assembly-CSharp
         m_MethodName: Destroy
         m_Mode: 1
         m_Arguments:
@@ -176,3 +176,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d574e9e28ac8a9341bba098196f7fec4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  damage: 1

@@ -1,22 +1,22 @@
 /*******************************************************
-* Script:      ObjectHealth.cs
+* Script:      EnemyHealth.cs
 * Author(s):   Alexander Art
 * 
 * Description:
-*    Basic health management for objects.
+*    Basic health management for enemies.
 *******************************************************/
 
 using UnityEngine;
 using UnityEngine.Events;
 
-public class ObjectHealth : MonoBehaviour
+public class EnemyHealth : MonoBehaviour
 {
-    [SerializeField, Tooltip("Default health for this object.")] 
-    private int maxHealth = 1;
+    [SerializeField, Tooltip("Default health for this enemy.")] 
+    private int maxHealth = 2;
 
     private int currentHealth;
 
-    [SerializeField, Tooltip("These functions are called when the object runs out of health.")] 
+    [SerializeField, Tooltip("These functions are called when the enemy runs out of health.")] 
     private UnityEvent OnDeath; // Attach functions to this in the Unity Inspector
 
     void Awake()
@@ -39,7 +39,7 @@ public class ObjectHealth : MonoBehaviour
     }
 
     //~(Kill)~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // Kills object (respectfully)
+    // Kills enemy (respectfully)
     public void Kill()
     {
         // Invokes all functions attached to the OnDeath event.
@@ -48,8 +48,8 @@ public class ObjectHealth : MonoBehaviour
     }
 
     //~(Destroy)~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // This function should attached to the object prefab's OnDeath event
-    // so that the object is destroyed when its health reaches 0.
+    // This function should attached to the enemy prefab's OnDeath event
+    // so that the enemy GameObject is destroyed when its health reaches 0.
     public void Destroy()
     {
         GameObject.Destroy(this.gameObject);
