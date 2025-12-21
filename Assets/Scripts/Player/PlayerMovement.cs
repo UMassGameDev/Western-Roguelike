@@ -6,7 +6,7 @@ public class PlayerMovement : MonoBehaviour
     // This [] is an attribute, attributes mostly provide additional info in the editor.
     [SerializeField, Tooltip("Distance moved per frame in meters per second.")]
     private float moveSpeed = 5f;
-    [SerializeField, Tooltip("Move Speed multiplier when the player is touching a cactus.")]
+    [SerializeField, Tooltip("Move Speed multiplier applied when the player is touching a cactus.")]
     private float cactusDebuff = 0.5f;
 
     private Rigidbody2D playerRB;

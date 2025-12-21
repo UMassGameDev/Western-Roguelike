@@ -42,8 +42,19 @@ public class Bullet : MonoBehaviour
                 GameObject effect = Instantiate(hitEffect, hit.point, Quaternion.identity);
                 Destroy(effect, 0.1f);
 
+                // Check if the collided object has EnemyHealth
+                EnemyHealth enemyHealth = hit.collider.gameObject.GetComponent<EnemyHealth>(); 
+                if (enemyHealth != null)
+                {
+                    // Damage the collided object
+                    enemyHealth.Damage(damage);
+                }
+
                 // Delete the bullet
                 Destroy(this.gameObject);
+                
+                // End loop
+                break;
             }
             // If bullet hit trigger collider
             else if (hit.collider.isTrigger)
