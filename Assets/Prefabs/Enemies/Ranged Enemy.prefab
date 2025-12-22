@@ -242,6 +242,13 @@ MonoBehaviour:
   persistentRadius: 20
   farRange: 5
   closeRange: 3
+  bulletObj: {fileID: 1548784170395063139, guid: 3b86f00c3c96cfc43bde2a3886234bf7, type: 3}
+  flareObj: {fileID: 5832922978901417772, guid: fc6664f3f32ca0340b0444a806874dd5, type: 3}
+  muzzle: {fileID: 8679253230996936427}
+  cooldown: 0.5
+  bulletSpeed: 60
+  shootSound: {fileID: 8300000, guid: cac629d478abb654bafd3f1c39acc3e7, type: 3}
+  audioSource: {fileID: 7529072245145663537}
 --- !u!1 &8735350673127444064
 GameObject:
   m_ObjectHideFlags: 0

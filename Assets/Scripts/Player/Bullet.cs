@@ -31,8 +31,33 @@ public class Bullet : MonoBehaviour
         // In order of what is hit first
         foreach (RaycastHit2D hit in hits)
         {
+            // If bullet hit non-trigger collider (excluding the enemy if playerBullet is false)
+            if (!hit.collider.isTrigger && !playerBullet && hit.transform.GetComponent<EnemyHealth>() == null)
+            {
+                // Show debug info
+                Debug.Log($"Bullet hit {hit.collider.gameObject.name} at {hit.point}");
+                Debug.DrawLine(this.transform.position, hit.point, Color.red, 100f);
+
+                // Temporarily instantiate the hit effect
+                GameObject effect = Instantiate(hitEffect, hit.point, Quaternion.identity);
+                Destroy(effect, 0.1f);
+
+                // Check if the collided object has PlayerHealth
+                PlayerHealth playerHealth = hit.collider.gameObject.GetComponent<PlayerHealth>(); 
+                if (playerHealth != null)
+                {
+                    // Damage the collided object
+                    playerHealth.Damage(damage);
+                } 
+
+                // Delete the bullet
+                Destroy(this.gameObject);
+                
+                // End loop
+                break;
+            }
             // If bullet hit non-trigger collider (excluding the player if playerBullet is true)
-            if (!hit.collider.isTrigger && (!playerBullet || hit.transform.GetComponent<PlayerShoot>() == null))
+            else if (!hit.collider.isTrigger && playerBullet && hit.transform.GetComponent<PlayerHealth>() == null)
             {
                 // Show debug info
                 Debug.Log($"Bullet hit {hit.collider.gameObject.name} at {hit.point}");
