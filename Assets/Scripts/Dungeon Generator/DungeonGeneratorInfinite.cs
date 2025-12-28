@@ -156,6 +156,7 @@ public class DungeonGeneratorInfinite : MonoBehaviour
         // Perlin noise for biome shapes
         float smoothNoise1 = Mathf.PerlinNoise(x * 0.05f + seedX, y * 0.05f + seedY);
         float smoothNoise2 = Mathf.PerlinNoise(x * 0.05f + seedY * 2, y * 0.05f + seedX);
+        float smoothNoise3 = Mathf.PerlinNoise(x * 0.05f + seedY, y * 0.05f + seedX * 2);
 
         // Ensure that everything from (0, 0) to spawnAreaRadius cannot be plateau,
         // from spawnAreaRadius to 2 * spawnAreaRadius transitions linearly,
@@ -166,7 +167,7 @@ public class DungeonGeneratorInfinite : MonoBehaviour
         {
             return 1;
         }
-        else if (smoothNoise1 > 0.5f && smoothNoise2 > 0.65f)
+        else if (smoothNoise2 > 0.6f && smoothNoise3 > 0.6f)
         {
             return 2;
         }
@@ -200,6 +201,7 @@ public class DungeonGeneratorInfinite : MonoBehaviour
     //~(GetRoom)~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Determines if a room should be generated at the passed coordinate.
     // Returns 0 for no room and 1 for room.
+    // Additionally, if a room is found that has not yet been generated, then the entire room is generated.
     private int GetRoom(int x, int y)
     {
         // This should be an odd number
@@ -285,13 +287,27 @@ public class DungeonGeneratorInfinite : MonoBehaviour
             }
         }
 
-        // Fill the tile with wall if:
+        // The tile contains a room if:
         // - A building was found
-        // - The found building has no chance of overlapping with any other building
-        // - The found building is not touching a plateau biome
+        // - The placement of the building was validated
         // - The tile at (x, y) is within the bounds of the room
         if (maxRoomValue > 0 && validPlacement && roomX <= x && roomX + roomSize.x > x && roomY <= y && roomY + roomSize.y > y)
         {
+            // If the room has not been generated yet, then generate it.
+            // Generating the room all at once is more efficient, and it
+            // will make it easier to generate the interior of each room.
+            if (GetTile(roomX, roomY) == null)
+            {
+                // Generate the entire room
+                for (int ry = roomY; ry < roomY + roomSize.y; ry++)
+                {
+                    for (int rx = roomX; rx < roomX + roomSize.x; rx++)
+                    {
+                        SetTile(rx, ry, wallTile);
+                    }
+                }
+            }
+
             return 1;
         }
         else
