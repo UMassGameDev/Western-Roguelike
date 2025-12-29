@@ -167,7 +167,7 @@ public class DungeonGeneratorInfinite : MonoBehaviour
         {
             return 1;
         }
-        else if (smoothNoise2 > 0.6f && smoothNoise3 > 0.6f)
+        else if (smoothNoise2 > 0.65f && smoothNoise3 > 0.65f)
         {
             return 2;
         }

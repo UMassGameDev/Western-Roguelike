@@ -22,4 +22,10 @@ public class Cactus : MonoBehaviour
             playerHealth.Damage(damage);
         }
     }
+
+    // Function for instantiating particles at the cactus's position
+    public void instantiateParticles(ParticleSystem particles)
+    {
+        Instantiate(particles, transform.position, Quaternion.identity);
+    }
 }
