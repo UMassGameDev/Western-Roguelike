@@ -1,14 +1,10 @@
 /*******************************************************
-* Script:      DungeonGenerator.cs
+* Script:      DungeonGeneratorInfinite.cs
 * Author(s):   Alexander Art, Nicholas Johnson
 * 
 * Description:
 *    This script generates a random roguelike dungeon from a set of tiles
 *    on a tilemap.
-* 
-* Notes:
-*    Dungeon Generator originally modeled after the generator found here, translated from DART to C#:
-*    https://github.com/munificent/hauberk/blob/db360d9efa714efb6d937c31953ef849c7394a39/lib/src/content/dungeon.dart
 *******************************************************/
 
 using System;
@@ -47,6 +43,8 @@ public class DungeonGeneratorInfinite : MonoBehaviour
     [Header("Prefabs:")]
     [SerializeField, Tooltip("Prefab for cacti.")]
     private GameObject cactusPrefab;
+    [SerializeField, Tooltip("Prefab for an enemy. Currently, all enemies are part of the world generation.")]
+    private GameObject enemyPrefab;
 
     [Header("Parameters:")]
     [SerializeField, Tooltip("Radius around the spawn that terrain will not generate. This also determines the spawn building size.")]
@@ -57,6 +55,8 @@ public class DungeonGeneratorInfinite : MonoBehaviour
     private float plainsBiomeCactusPercentage = 0.01f;
     [SerializeField, Tooltip("Percentage of floor tiles in cactus biomes that generate cacti."), Range(0, 1)]
     private float cactusBiomeCactusPercentage = 0.5f;
+    [SerializeField, Tooltip("Percentage of tiles inside of buildings that generate enemies."), Range(0, 1)]
+    private float enemyPercentage = 0.1f;
 
     // Seed works as an offset rather than an actual seed because Mathf.PerlinNoise does not support seeding
     private int seedX;
@@ -78,17 +78,18 @@ public class DungeonGeneratorInfinite : MonoBehaviour
         int cameraTileWidth = 20;
         int cameraTileHeight = 12;
 
+        // Loop through each tile in the area around the player
         for (int y = playerTileY - cameraTileHeight / 2; y <= playerTileY + cameraTileHeight / 2; y++)
         {
             for (int x = playerTileX - cameraTileWidth / 2; x <= playerTileX + cameraTileWidth / 2; x++)
             {
-                if (GetTile(x, y) == null) // Avoids generating same position twice
+                if (GetTile(x, y) == null) // Avoids generating the same position twice
                 {
-                    // Generate and set the tile
-                    SetTile(x, y, GenerateTile(x, y));
+                    // Generate the tile (and the surrounding building, if there is one)
+                    GenerateTile(x, y);
 
-                    // Floor tiles outside the spawn area have a chance of generating a cactus
-                    if (GetTile(x, y) == floorTile && Mathf.Sqrt(x * x + y * y) > spawnAreaRadius)
+                    // Floor tiles outside the spawn area and outside any buildings have a chance of generating a cactus
+                    if (GetTile(x, y) == floorTile && Mathf.Sqrt(x * x + y * y) > spawnAreaRadius && GetRoom(x, y) == 0)
                     {
                         // The percentage of cactus generated per tile depends on the biome
                         if (GetBiome(x, y) == 0 && GetRandomNoise2(x, y) < plainsBiomeCactusPercentage)
@@ -119,17 +120,24 @@ public class DungeonGeneratorInfinite : MonoBehaviour
         tilemap.SetTile(new Vector3Int(x, y, 0), tileAsset);
     }
 
-    //~(SetTile)~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // Returns which tile should be generated at the passed coordinate.
-    private TileBase GenerateTile(int x, int y)
+    //~(GenerateTile)~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // Generates a tile at the passed coordinate.
+    // Note that buildings are generated all at once, so this function may affect more tiles than the ones explicitly passed to it.
+    private void GenerateTile(int x, int y)
     {
-        if (GetBiome(x, y) == 1 || GetSpawnBuilding(x, y) == 1 || GetRoom(x, y) == 1)
+        // GetRoom automatically generates the entire room when any tile from a room is found,
+        // so this function (GenerateTile) does not need to do anything when GetRoom returns 1. 
+        if (GetRoom(x, y) == 0)
         {
-            return wallTile;
-        }
-        else
-        {
-            return floorTile;
+            // Generate terrain and the spawn building
+            if (GetBiome(x, y) == 1 || GetSpawnBuilding(x, y) == 1)
+            {
+                SetTile(x, y, wallTile);
+            }
+            else
+            {
+                SetTile(x, y, floorTile);
+            }
         }
     }
 
@@ -294,18 +302,10 @@ public class DungeonGeneratorInfinite : MonoBehaviour
         if (maxRoomValue > 0 && validPlacement && roomX <= x && roomX + roomSize.x > x && roomY <= y && roomY + roomSize.y > y)
         {
             // If the room has not been generated yet, then generate it.
-            // Generating the room all at once is more efficient, and it
-            // will make it easier to generate the interior of each room.
+            // Generating rooms all at once is more efficient and easier than generating rooms one tile at a time.
             if (GetTile(roomX, roomY) == null)
             {
-                // Generate the entire room
-                for (int ry = roomY; ry < roomY + roomSize.y; ry++)
-                {
-                    for (int rx = roomX; rx < roomX + roomSize.x; rx++)
-                    {
-                        SetTile(rx, ry, wallTile);
-                    }
-                }
+                GenerateRoom(roomX, roomY, roomSize);
             }
 
             return 1;
@@ -361,6 +361,89 @@ public class DungeonGeneratorInfinite : MonoBehaviour
         }
 
         return roomSize;
+    }
+
+    //~(GenerateRoom)~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // Generates a room at the passed coordinate.
+    // Logic that prevents rooms from overlapping is done outside this function.
+    private void GenerateRoom(int roomTopLeftX, int roomTopLeftY, Vector2Int roomSize)
+    {
+        // Probability for an exterior wall to be generated as a door
+        float doorPercentage = 0.1f;
+
+        // At least one door must be generated
+        bool doorGenerated = false;
+        int doorAttemptIterations = 0;
+        int maxDoorAttempts = 1000; // Unlikely to be needed, but prevents an infinite while loop, just in case
+        
+        // Generate interior tiles and the corner tiles of the room
+        for (int ry = roomTopLeftY; ry < roomTopLeftY + roomSize.y; ry++)
+        {
+            for (int rx = roomTopLeftX; rx < roomTopLeftX + roomSize.x; rx++)
+            {
+                // Inside
+                if (roomTopLeftX < rx && rx < roomTopLeftX + roomSize.x - 1 && roomTopLeftY < ry && ry < roomTopLeftY + roomSize.y - 1)
+                {
+                    SetTile(rx, ry, floorTile);
+                }
+                // Corners
+                else if (!(roomTopLeftX < rx && rx < roomTopLeftX + roomSize.x - 1) && !(roomTopLeftY < ry && ry < roomTopLeftY + roomSize.y - 1))
+                {
+                    SetTile(rx, ry, wallTile);
+                }
+            }
+        }
+
+        // Generate at least one door
+        while (!doorGenerated && doorAttemptIterations < maxDoorAttempts)
+        {
+            for (int ry = roomTopLeftY; ry < roomTopLeftY + roomSize.y; ry++)
+            {
+                for (int rx = roomTopLeftX; rx < roomTopLeftX + roomSize.x; rx++)
+                {
+                    // Exclude the inside and corners that have already been generated
+                    if (GetTile(rx, ry) == null)
+                    {
+                        if (GetRandomNoise2(rx + doorAttemptIterations, ry + doorAttemptIterations) < doorPercentage)
+                        {
+                            SetTile(rx, ry, floorTile);
+                            doorGenerated = true;
+                        }
+                    }
+                }
+            }
+            doorAttemptIterations++;
+        }
+
+        if (doorAttemptIterations == maxDoorAttempts)
+        {
+            Debug.LogWarning("That door did NOT want to generate. A building is inaccessible!");
+        }
+
+        // Fill in the remaining tiles with walls
+        for (int ry = roomTopLeftY; ry < roomTopLeftY + roomSize.y; ry++)
+        {
+            for (int rx = roomTopLeftX; rx < roomTopLeftX + roomSize.x; rx++)
+            {
+                if (GetTile(rx, ry) == null)
+                {
+                    SetTile(rx, ry, wallTile);
+                }
+            }
+        }
+
+        // Place enemies inside the building
+        // With this implementation, buildings are not guaranteed to have enemies
+        for (int ry = roomTopLeftY + 1; ry < roomTopLeftY + roomSize.y - 1; ry++)
+        {
+            for (int rx = roomTopLeftX + 1; rx < roomTopLeftX + roomSize.x - 1; rx++)
+            {
+                if (GetRandomNoise2(rx, ry) < enemyPercentage)
+                {
+                    Instantiate(enemyPrefab, new UnityEngine.Vector3(rx + 0.5f, ry + 0.5f, -0.5f), UnityEngine.Quaternion.identity);
+                }
+            }
+        }
     }
 
     //~(PlacePlayer)~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
