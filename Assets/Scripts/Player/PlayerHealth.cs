@@ -18,8 +18,11 @@ public class PlayerHealth : MonoBehaviour
 {
     [SerializeField, Tooltip("Default player health.")] 
     private int maxHealth = 3;
+    [SerializeField, Tooltip("Invincibility duration after player gets hit (seconds).")]
+    private float iFrameDuration = 0.6f;
 
     private int currentHealth;
+    private float hitTime; // Time the player was hit for calculating I-frame duration
 
     // Attach functions to these in the Unity Inspector or with .AddListener
     [Tooltip("These functions are called when the player's maximum or current health changes.")] 
@@ -37,8 +40,15 @@ public class PlayerHealth : MonoBehaviour
     // Other scripts can call this function to damage the player.
     public void Damage(int amount)
     {
-        // Subtract health
-        currentHealth -= amount;
+        // If no I-frames active
+        if (Time.time > hitTime + iFrameDuration)
+        {
+            // Subtract health
+            currentHealth -= amount;
+
+            // Start new I-frames
+            hitTime = Time.time;
+        }
 
         // Invoke all functions listening to the OnHealthChanged event
         OnHealthChanged?.Invoke(maxHealth, currentHealth);
