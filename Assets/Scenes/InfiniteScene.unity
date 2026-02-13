@@ -495,8 +495,8 @@ MonoBehaviour:
   plainsBiomeCactusPercentage: 0.01
   cactusBiomeCactusPercentage: 0.5
   enemyPercentage: 0.1
-  cameraTileWidth: 200
-  cameraTileHeight: 120
+  cameraTileWidth: 20
+  cameraTileHeight: 12
 --- !u!1 &615603967
 GameObject:
   m_ObjectHideFlags: 0
