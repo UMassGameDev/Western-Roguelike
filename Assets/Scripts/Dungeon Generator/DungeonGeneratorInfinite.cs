@@ -57,6 +57,10 @@ public class DungeonGeneratorInfinite : MonoBehaviour
     private float cactusBiomeCactusPercentage = 0.5f;
     [SerializeField, Tooltip("Percentage of tiles inside of buildings that generate enemies."), Range(0, 1)]
     private float enemyPercentage = 0.1f;
+    [SerializeField, Tooltip("Width of rectangle used for generation around the player")]
+    private int cameraTileWidth = 20;
+    [SerializeField, Tooltip("Height of rectangle used for generation around the player")]
+    private int cameraTileHeight = 12;
 
     // Seed works as an offset rather than an actual seed because Mathf.PerlinNoise does not support seeding
     private int seedX;
@@ -75,8 +79,6 @@ public class DungeonGeneratorInfinite : MonoBehaviour
         int playerTileY = (int)Math.Floor(playerInstance.transform.position.y);
 
         // Area around the player to generate tiles
-        int cameraTileWidth = 20;
-        int cameraTileHeight = 12;
 
         // Loop through each tile in the area around the player
         for (int y = playerTileY - cameraTileHeight / 2; y <= playerTileY + cameraTileHeight / 2; y++)
