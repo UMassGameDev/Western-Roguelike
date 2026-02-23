@@ -93,7 +93,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   targetScene: MainScene
-  audio: {fileID: 2957942006173001918}
+  audioSource: {fileID: 2957942006173001918}
 --- !u!82 &2957942006173001918
 AudioSource:
   m_ObjectHideFlags: 0
