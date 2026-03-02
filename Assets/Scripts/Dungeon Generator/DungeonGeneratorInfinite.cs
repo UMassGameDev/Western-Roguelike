@@ -36,7 +36,7 @@ public class DungeonGeneratorInfinite : MonoBehaviour
 
     [Header("Rendered tiles:")]
     [SerializeField, Tooltip("Tile used to represent walls.")]
-    private TileBase wallTile;
+    private RuleTile wallTile;
     [SerializeField, Tooltip("Tile used to represent floors.")]
     private TileBase floorTile;
 
@@ -77,8 +77,6 @@ public class DungeonGeneratorInfinite : MonoBehaviour
     {
         int playerTileX = (int)Math.Floor(playerInstance.transform.position.x);
         int playerTileY = (int)Math.Floor(playerInstance.transform.position.y);
-
-        // Area around the player to generate tiles
 
         // Loop through each tile in the area around the player
         for (int y = playerTileY - cameraTileHeight / 2; y <= playerTileY + cameraTileHeight / 2; y++)

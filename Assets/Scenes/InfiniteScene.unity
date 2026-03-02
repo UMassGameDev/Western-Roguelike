@@ -486,8 +486,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerInstance: {fileID: 1213993815}
   tilemap: {fileID: 598603759}
-  wallTile: {fileID: 11400000, guid: 4a9f1fbea4cf6ff4d8dd3eeb179b557f, type: 2}
-  floorTile: {fileID: 11400000, guid: 9558e05e3b7aaef4680eeb3fd7667c9d, type: 2}
+  wallTile: {fileID: 11400000, guid: 5f0f30681f681724e8c4345aafea9da8, type: 2}
+  floorTile: {fileID: 11400000, guid: e611435992b3ce34d8d4acbee99e6ee3, type: 2}
   cactusPrefab: {fileID: 6993609107519788527, guid: a8a3420f6b8d245429633a7f399afb36, type: 3}
   enemyPrefab: {fileID: 5813641010066698784, guid: 7899b93e6aeba6f4486e3e7faba05746, type: 3}
   spawnAreaRadius: 7
@@ -495,8 +495,8 @@ MonoBehaviour:
   plainsBiomeCactusPercentage: 0.01
   cactusBiomeCactusPercentage: 0.5
   enemyPercentage: 0.1
-  cameraTileWidth: 20
-  cameraTileHeight: 12
+  cameraTileWidth: 200
+  cameraTileHeight: 120
 --- !u!1 &615603967
 GameObject:
   m_ObjectHideFlags: 0
@@ -968,6 +968,10 @@ PrefabInstance:
     - target: {fileID: 2302360801736180166, guid: f9e6328026d43a649a47cf4284ba67db, type: 3}
       propertyPath: m_Name
       value: Main Camera
+      objectReference: {fileID: 0}
+    - target: {fileID: 5116546670932032138, guid: f9e6328026d43a649a47cf4284ba67db, type: 3}
+      propertyPath: m_AssetsPPU
+      value: 32
       objectReference: {fileID: 0}
     - target: {fileID: 8473661887616840066, guid: f9e6328026d43a649a47cf4284ba67db, type: 3}
       propertyPath: m_LocalPosition.x

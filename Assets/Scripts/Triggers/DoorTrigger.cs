@@ -8,14 +8,14 @@ public class DoorTrigger : MonoBehaviour
     private string targetScene = "MainScene";
     
     [SerializeField, Tooltip("The sound that plays when you go through this door.")] 
-    private AudioSource audio;
+    private AudioSource audioSource;
 
     // Detects if <other> is player, and if so, loads <targetScene> with a fade effect:
     private void OnTriggerEnter2D(Collider2D other)
     {
         if (other.CompareTag("Player"))
         {
-            audio.Play();
+            audioSource.Play();
             SceneLoader.Instance.LoadSceneWithFade(targetScene);
         }
     }
