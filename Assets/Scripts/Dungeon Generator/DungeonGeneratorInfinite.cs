@@ -30,9 +30,15 @@ public class DungeonGeneratorInfinite : MonoBehaviour
     [SerializeField, Tooltip("The player instance in the scene.")] 
     private GameObject playerInstance;
 
-    [Header("Tilemap:")]
-    [SerializeField, Tooltip("The tilemap to set tiles to.")]
-    private Tilemap tilemap;
+    [Header("Camera:")]
+    [SerializeField, Tooltip("The camera instance in the scene.")] 
+    private Camera cameraInstance;
+
+    [Header("Tilemaps:")]
+    [SerializeField, Tooltip("The tilemap to set wall tiles to.")]
+    private Tilemap wallTilemap;
+    [SerializeField, Tooltip("The tilemap to set floor tiles to.")]
+    private Tilemap floorTilemap;
 
     [Header("Rendered tiles:")]
     [SerializeField, Tooltip("Tile used to represent walls.")]
@@ -57,10 +63,6 @@ public class DungeonGeneratorInfinite : MonoBehaviour
     private float cactusBiomeCactusPercentage = 0.5f;
     [SerializeField, Tooltip("Percentage of tiles inside of buildings that generate enemies."), Range(0, 1)]
     private float enemyPercentage = 0.1f;
-    [SerializeField, Tooltip("Width of rectangle used for generation around the player")]
-    private int cameraTileWidth = 20;
-    [SerializeField, Tooltip("Height of rectangle used for generation around the player")]
-    private int cameraTileHeight = 12;
 
     // Seed works as an offset rather than an actual seed because Mathf.PerlinNoise does not support seeding
     private int seedX;
@@ -78,18 +80,21 @@ public class DungeonGeneratorInfinite : MonoBehaviour
         int playerTileX = (int)Math.Floor(playerInstance.transform.position.x);
         int playerTileY = (int)Math.Floor(playerInstance.transform.position.y);
 
+        int cameraTileWidth = (int)Math.Ceiling(cameraInstance.orthographicSize * cameraInstance.aspect * 2f) + 2;
+        int cameraTileHeight = (int)Math.Ceiling(cameraInstance.orthographicSize * 2f) + 2;
+
         // Loop through each tile in the area around the player
         for (int y = playerTileY - cameraTileHeight / 2; y <= playerTileY + cameraTileHeight / 2; y++)
         {
             for (int x = playerTileX - cameraTileWidth / 2; x <= playerTileX + cameraTileWidth / 2; x++)
             {
-                if (GetTile(x, y) == null) // Avoids generating the same position twice
+                if (GetTile(x, y, floorTilemap) == null) // Avoids generating the same position twice
                 {
                     // Generate the tile (and the surrounding building, if there is one)
                     GenerateTile(x, y);
 
                     // Floor tiles outside the spawn area and outside any buildings have a chance of generating a cactus
-                    if (GetTile(x, y) == floorTile && Mathf.Sqrt(x * x + y * y) > spawnAreaRadius && GetRoom(x, y) == 0)
+                    if (GetTile(x, y, wallTilemap) == null && Mathf.Sqrt(x * x + y * y) > spawnAreaRadius && GetRoom(x, y) == 0)
                     {
                         // The percentage of cactus generated per tile depends on the biome
                         if (GetBiome(x, y) == 0 && GetRandomNoise2(x, y) < plainsBiomeCactusPercentage)
@@ -108,14 +113,14 @@ public class DungeonGeneratorInfinite : MonoBehaviour
 
     //~(GetTile)~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Gets tilemap tile
-    private TileBase GetTile(int x, int y)
+    private TileBase GetTile(int x, int y, Tilemap tilemap)
     {
         return tilemap.GetTile(new Vector3Int(x, y, 0));
     }
 
     //~(SetTile)~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Sets tilemap tile
-    private void SetTile(int x, int y, TileBase tileAsset)
+    private void SetTile(int x, int y, Tilemap tilemap, TileBase tileAsset)
     {
         tilemap.SetTile(new Vector3Int(x, y, 0), tileAsset);
     }
@@ -132,11 +137,12 @@ public class DungeonGeneratorInfinite : MonoBehaviour
             // Generate terrain and the spawn building
             if (GetBiome(x, y) == 1 || GetSpawnBuilding(x, y) == 1)
             {
-                SetTile(x, y, wallTile);
+                SetTile(x, y, wallTilemap, wallTile);
+                SetTile(x, y, floorTilemap, floorTile);
             }
             else
             {
-                SetTile(x, y, floorTile);
+                SetTile(x, y, floorTilemap, floorTile);
             }
         }
     }
@@ -303,7 +309,7 @@ public class DungeonGeneratorInfinite : MonoBehaviour
         {
             // If the room has not been generated yet, then generate it.
             // Generating rooms all at once is more efficient and easier than generating rooms one tile at a time.
-            if (GetTile(roomX, roomY) == null)
+            if (GetTile(roomX, roomY, floorTilemap) == null)
             {
                 GenerateRoom(roomX, roomY, roomSize);
             }
@@ -384,12 +390,13 @@ public class DungeonGeneratorInfinite : MonoBehaviour
                 // Inside
                 if (roomTopLeftX < rx && rx < roomTopLeftX + roomSize.x - 1 && roomTopLeftY < ry && ry < roomTopLeftY + roomSize.y - 1)
                 {
-                    SetTile(rx, ry, floorTile);
+                    SetTile(rx, ry, floorTilemap, floorTile);
                 }
                 // Corners
                 else if (!(roomTopLeftX < rx && rx < roomTopLeftX + roomSize.x - 1) && !(roomTopLeftY < ry && ry < roomTopLeftY + roomSize.y - 1))
                 {
-                    SetTile(rx, ry, wallTile);
+                    SetTile(rx, ry, wallTilemap, wallTile);
+                    SetTile(rx, ry, floorTilemap, floorTile);
                 }
             }
         }
@@ -402,11 +409,11 @@ public class DungeonGeneratorInfinite : MonoBehaviour
                 for (int rx = roomTopLeftX; rx < roomTopLeftX + roomSize.x; rx++)
                 {
                     // Exclude the inside and corners that have already been generated
-                    if (GetTile(rx, ry) == null)
+                    if (GetTile(rx, ry, floorTilemap) == null)
                     {
                         if (GetRandomNoise2(rx + doorAttemptIterations, ry + doorAttemptIterations) < doorPercentage)
                         {
-                            SetTile(rx, ry, floorTile);
+                            SetTile(rx, ry, floorTilemap, floorTile);
                             doorGenerated = true;
                         }
                     }
@@ -425,9 +432,10 @@ public class DungeonGeneratorInfinite : MonoBehaviour
         {
             for (int rx = roomTopLeftX; rx < roomTopLeftX + roomSize.x; rx++)
             {
-                if (GetTile(rx, ry) == null)
+                if (GetTile(rx, ry, floorTilemap) == null)
                 {
-                    SetTile(rx, ry, wallTile);
+                    SetTile(rx, ry, wallTilemap, wallTile);
+                    SetTile(rx, ry, floorTilemap, floorTile);
                 }
             }
         }
