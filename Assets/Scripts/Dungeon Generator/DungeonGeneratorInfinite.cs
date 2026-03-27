@@ -30,9 +30,11 @@ public class DungeonGeneratorInfinite : MonoBehaviour
     [SerializeField, Tooltip("The player instance in the scene.")] 
     private GameObject playerInstance;
 
-    [Header("Tilemap:")]
-    [SerializeField, Tooltip("The tilemap to set tiles to.")]
+    [Header("Tilemaps:")]
+    [SerializeField, Tooltip("The tilemap to set wall tiles to.")]
     private Tilemap tilemap;
+    [SerializeField, Tooltip("The tilemap to set floor tiles to.")]
+    private Tilemap floor;
 
     [Header("Rendered tiles:")]
     [SerializeField, Tooltip("Tile used to represent walls.")]
@@ -119,6 +121,10 @@ public class DungeonGeneratorInfinite : MonoBehaviour
     {
         tilemap.SetTile(new Vector3Int(x, y, 0), tileAsset);
     }
+    private void SetTileFloor(int x, int y, TileBase tileAsset)
+    {
+        floor.SetTile(new Vector3Int(x, y, 0), tileAsset);
+    }
 
     //~(GenerateTile)~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Generates a tile at the passed coordinate.
@@ -133,6 +139,7 @@ public class DungeonGeneratorInfinite : MonoBehaviour
             if (GetBiome(x, y) == 1 || GetSpawnBuilding(x, y) == 1)
             {
                 SetTile(x, y, wallTile);
+                SetTileFloor(x, y, floorTile);
             }
             else
             {
@@ -390,6 +397,7 @@ public class DungeonGeneratorInfinite : MonoBehaviour
                 else if (!(roomTopLeftX < rx && rx < roomTopLeftX + roomSize.x - 1) && !(roomTopLeftY < ry && ry < roomTopLeftY + roomSize.y - 1))
                 {
                     SetTile(rx, ry, wallTile);
+                    SetTileFloor(rx, ry, floorTile);
                 }
             }
         }
@@ -428,6 +436,7 @@ public class DungeonGeneratorInfinite : MonoBehaviour
                 if (GetTile(rx, ry) == null)
                 {
                     SetTile(rx, ry, wallTile);
+                    SetTileFloor(rx, ry, floorTile);
                 }
             }
         }
