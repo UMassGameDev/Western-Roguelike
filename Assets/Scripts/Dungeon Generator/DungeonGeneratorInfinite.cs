@@ -49,8 +49,8 @@ public class DungeonGeneratorInfinite : MonoBehaviour
     [Header("Prefabs:")]
     [SerializeField, Tooltip("Prefab for cacti.")]
     private GameObject cactusPrefab;
-    [SerializeField, Tooltip("Prefab for an enemy. Currently, all enemies are part of the world generation.")]
-    private GameObject enemyPrefab;
+    [SerializeField, Tooltip("List of enemy prefabs. Currently, all enemies are part of the world generation (don't spawn naturally).")]
+    private List<GameObject> enemyPrefabs;
 
     [Header("Parameters:")]
     [SerializeField, Tooltip("Radius around the spawn that terrain will not generate. This also determines the spawn building size.")]
@@ -448,7 +448,14 @@ public class DungeonGeneratorInfinite : MonoBehaviour
             {
                 if (GetRandomNoise2(rx, ry) < enemyPercentage)
                 {
-                    Instantiate(enemyPrefab, new UnityEngine.Vector3(rx + 0.5f, ry + 0.5f, -0.5f), UnityEngine.Quaternion.identity);
+                    // Pick random enemy type to spawn
+                    for (int i = 0; i < enemyPrefabs.Count; i++)
+                    {
+                        if (GetRandomNoise2(rx, ry) < enemyPercentage / enemyPrefabs.Count * (i + 1)) {
+                            Instantiate(enemyPrefabs[i], new UnityEngine.Vector3(rx + 0.5f, ry + 0.5f, -0.5f), UnityEngine.Quaternion.identity);
+                            break;
+                        }
+                    }
                 }
             }
         }

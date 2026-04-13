@@ -185,7 +185,9 @@ MonoBehaviour:
   wallTile: {fileID: 11400000, guid: 5f0f30681f681724e8c4345aafea9da8, type: 2}
   floorTile: {fileID: 11400000, guid: e611435992b3ce34d8d4acbee99e6ee3, type: 2}
   cactusPrefab: {fileID: 6993609107519788527, guid: a8a3420f6b8d245429633a7f399afb36, type: 3}
-  enemyPrefab: {fileID: 5813641010066698784, guid: 7899b93e6aeba6f4486e3e7faba05746, type: 3}
+  enemyPrefabs:
+  - {fileID: 5813641010066698784, guid: 43f174cfe77b9b948b6e237a61f36cf4, type: 3}
+  - {fileID: 5813641010066698784, guid: 7899b93e6aeba6f4486e3e7faba05746, type: 3}
   spawnAreaRadius: 7
   roomDensity: 0.05
   plainsBiomeCactusPercentage: 0.01
@@ -747,6 +749,50 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0651d678e792c234bb3f17352c5a85f8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &1234535222
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1234535224}
+  - component: {fileID: 1234535223}
+  m_Layer: 0
+  m_Name: Pathfinder
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1234535223
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1234535222}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f2f4f4f140cc18f418eb436315a69b26, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Pathfinder
+--- !u!4 &1234535224
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1234535222}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 3.56513, y: 1.97204, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1313439437
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1060,7 +1106,7 @@ MonoBehaviour:
   wallTile: {fileID: 11400000, guid: 5f0f30681f681724e8c4345aafea9da8, type: 2}
   floorTile: {fileID: 11400000, guid: e611435992b3ce34d8d4acbee99e6ee3, type: 2}
   cactusPrefab: {fileID: 6993609107519788527, guid: a8a3420f6b8d245429633a7f399afb36, type: 3}
-  enemyPrefab: {fileID: 5813641010066698784, guid: 7899b93e6aeba6f4486e3e7faba05746, type: 3}
+  enemyPrefabs: []
   spawnAreaRadius: 7
   roomDensity: 0.05
   plainsBiomeCactusPercentage: 0.01
@@ -1433,3 +1479,4 @@ SceneRoots:
   - {fileID: 620962322}
   - {fileID: 1313439437}
   - {fileID: 402167041}
+  - {fileID: 1234535224}

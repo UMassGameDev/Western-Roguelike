@@ -4,6 +4,7 @@
 * 
 * Description:
 *    Implements behavior for a ranged enemy.
+*    Note that this does not yet use Pathfinder.cs for pathfinding.
 *******************************************************/
 
 using UnityEngine;
@@ -48,15 +49,17 @@ public class BasicRangedEnemy : MonoBehaviour
 
 
     private Rigidbody2D enemyRB;
-    Transform target; // The player is the enemy's target and this gets assigned automatically
+    private Transform target; // The player is the enemy's target and this gets assigned automatically
+    private Camera cameraInstance;
 
     private bool lineOfSight = false;
     private bool targetDetected = false;
+    private bool onScreen = false;
 
-    float lastDetectionTime;
-    float lastShotTime;
-    float lastReloadTime;
-    float ammo;
+    private float lastDetectionTime;
+    private float lastShotTime;
+    private float lastReloadTime;
+    private float ammo;
 
     void Start()
     {
@@ -74,6 +77,9 @@ public class BasicRangedEnemy : MonoBehaviour
             Debug.LogWarning("playerObj not found.");
         }
 
+        // Assign camera instance
+        cameraInstance = GameObject.FindAnyObjectByType<Camera>().GetComponent<Camera>();
+
         // Load chambers
         ammo = chambers;
     }
@@ -90,13 +96,18 @@ public class BasicRangedEnemy : MonoBehaviour
         filter.SetLayerMask(~(1 << LayerMask.NameToLayer("Enemy")));    // Don't detect self or other enemies in the raycast
         RaycastHit2D[] result = new RaycastHit2D[1];                    // This is where the first result gets stored
         Physics2D.Raycast(enemyRB.position, targetDirection, filter, result, targetDistance); // Cast the ray
-        // If lineOfSight is about to turn true, then reset the reaction time delay
-        if (!lineOfSight && result[0].transform == target)
+        // For calculating if the player is on the enemy's "screen"
+        float cameraTileWidth = cameraInstance.orthographicSize * cameraInstance.aspect * 2f;
+        float cameraTileHeight = cameraInstance.orthographicSize * 2f;
+        // If either lineOfSight or onScreen is false but is about to turn true, reset the reaction time delay
+        if (!lineOfSight && result[0].transform == target || !onScreen && Mathf.Abs(target.position.x - enemyRB.position.x) < cameraTileWidth / 2f && Mathf.Abs(target.position.y - enemyRB.position.y) < cameraTileHeight / 2f)
         {
             lastDetectionTime = Time.time;
         }
         // If the raycast result is the player, then the line of sight is valid
         lineOfSight = result[0].transform == target;
+        // If the player is on the enemy's "screen"
+        onScreen = Mathf.Abs(target.position.x - enemyRB.position.x) < cameraTileWidth / 2f && Mathf.Abs(target.position.y - enemyRB.position.y) < cameraTileHeight / 2f;
         
         // If the target is already detected
         if (targetDetected)
@@ -117,9 +128,9 @@ public class BasicRangedEnemy : MonoBehaviour
             }
         }
 
-        // If the target is seen, the enemy had time to react, Shoot() is not on cooldown,
-        // reloading is not on cooldown, and the enemy has ammo, shoot.
-        if (targetDetected && lineOfSight && Time.time > lastDetectionTime + reactionTime && Time.time > lastShotTime + cooldown && Time.time > lastReloadTime + reloadTime && ammo > 0)
+        // If the target is seen, the target is on sreen, the enemy had time to react,
+        // Shoot() is not on cooldown, reloading is not on cooldown, and the enemy has ammo, shoot.
+        if (targetDetected && lineOfSight && onScreen && Time.time > lastDetectionTime + reactionTime && Time.time > lastShotTime + cooldown && Time.time > lastReloadTime + reloadTime && ammo > 0)
         {
             Shoot();
             lastShotTime = Time.time;  // Reset cooldown
