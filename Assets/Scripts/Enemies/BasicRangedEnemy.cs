@@ -7,7 +7,10 @@
 *    Note that this does not yet use Pathfinder.cs for pathfinding.
 *******************************************************/
 
+using System;
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Tilemaps;
 
 public class BasicRangedEnemy : MonoBehaviour
 {
@@ -47,10 +50,13 @@ public class BasicRangedEnemy : MonoBehaviour
     [SerializeField, Tooltip("Where <shootSound> is played.")]
     AudioSource audioSource;
 
-
     private Rigidbody2D enemyRB;
     private Transform target; // The player is the enemy's target and this gets assigned automatically
     private Camera cameraInstance;
+
+    private Pathfinder pathfinder; // Alternative implementation: each BasicRangedEnemy could use its own pathfinder object
+    private Tilemap wallTilemap;
+    private List<Vector2Int> path;
 
     private bool lineOfSight = false;
     private bool targetDetected = false;
@@ -79,6 +85,12 @@ public class BasicRangedEnemy : MonoBehaviour
 
         // Assign camera instance
         cameraInstance = GameObject.FindAnyObjectByType<Camera>().GetComponent<Camera>();
+
+        // Assign pathfinder
+        pathfinder = GameObject.Find("Pathfinder").GetComponent<Pathfinder>();
+
+        // Assign tilemap
+        wallTilemap = GameObject.Find("Walls (Tilemap)").GetComponent<Tilemap>();
 
         // Load chambers
         ammo = chambers;
@@ -153,16 +165,37 @@ public class BasicRangedEnemy : MonoBehaviour
         Vector2 targetDirection = ((Vector2)target.position - enemyRB.position).normalized;
         float targetDistance = Vector2.Distance(enemyRB.position, target.position);
 
-        // Move toward the target if:
-        // - There is a valid line of sight
-        // - The target is detected
-        // - The enemy is too far from the target
-        if (lineOfSight && targetDetected && targetDistance > farRange)
+        // Calculate a new path should be calculated if the tilemap has had time to load in and the target is detected
+        if (Time.fixedTime > 0 && targetDetected)
         {
-            enemyRB.MovePosition(Vector2.MoveTowards(enemyRB.position, target.position, moveSpeed * Time.fixedDeltaTime));
+            // Calculate a path from the enemy to the target
+            path = pathfinder.FindPath(new Vector2Int(Convert.ToInt32(enemyRB.position.x - 0.5f), Convert.ToInt32(enemyRB.position.y - 0.5f)), new Vector2Int(Convert.ToInt32(target.position.x - 0.5f), Convert.ToInt32(target.position.y - 0.5f)), wallTilemap);
         }
 
-        // Move away from the target if:
+        // Move toward the target if the target is detected and the enemy is too far from the target
+        if (targetDetected && targetDistance > farRange)
+        {
+            // The default direction to move in is directly toward the player
+            Vector2 destination = target.position;
+
+            // If a path is found, move along the path
+            if (path != null && path.Count > 0)
+            {
+                // Calculate where to move to based on the path
+                destination = (Vector2)path[0] + new Vector2(0.5f, 0.5f);
+
+                // Sometimes the current position of the enemy is part of the path. Use the second point of the path if that is the case.
+                if (destination == enemyRB.position && path.Count >= 2)
+                {
+                    destination = (Vector2)path[1] + new Vector2(0.5f, 0.5f);
+                }
+            }
+
+            // Move
+            enemyRB.MovePosition(Vector2.MoveTowards(enemyRB.position, destination, moveSpeed * Time.fixedDeltaTime));
+        }
+
+        // Move away from the target if the following 3 conditions are true:
         // - There is a valid line of sight
         // - The target is detected
         // - The enemy is too close to the target

@@ -14,8 +14,13 @@ using UnityEngine.Tilemaps;
 
 public class ZombieController : MonoBehaviour
 {
+    [Header("Movement")]
     [SerializeField, Tooltip("Distance moved per frame in meters per second.")]
     private float moveSpeed = 2f;
+    [SerializeField, Tooltip("Distance the target can be detected when there is a clear line of sight.")]
+    private float detectionRadius = 12f;
+    [SerializeField, Tooltip("Distance the target will remain detected.")]
+    private float persistentRadius = 20f;
 
     private Rigidbody2D zombieRB;
     private Transform target; // The player is the zombie's target and this gets assigned automatically
@@ -23,8 +28,12 @@ public class ZombieController : MonoBehaviour
     private Pathfinder pathfinder; // Alternative implementation: each ZombieController could use its own pathfinder object
     private Tilemap wallTilemap;
 
+    [Header("Audio")]
     [SerializeField, Tooltip("Where sound is played.")]
     private AudioSource audioSource;
+
+    private bool lineOfSight = false;
+    private bool targetDetected = false;
 
     private List<Vector2Int> path;
 
@@ -64,7 +73,20 @@ public class ZombieController : MonoBehaviour
         RaycastHit2D[] result = new RaycastHit2D[1];                    // This is where the first result gets stored
         Physics2D.Raycast(zombieRB.position, targetDirection, filter, result, targetDistance); // Cast the ray
         // If the raycast result is the player, then the line of sight is valid
-        //lineOfSight = result[0].transform == target;
+        lineOfSight = result[0].transform == target;
+
+        // If the target is already detected
+        if (targetDetected)
+        {
+            // The target stays detected until it moves outside the persistent radius
+            targetDetected = targetDistance < persistentRadius;
+        }
+        // If the target is not already detected
+        else
+        {
+            // The target is detected when it can be seen and is within the detection radius 
+            targetDetected = lineOfSight && targetDistance < detectionRadius;
+        }
     }
 
     void FixedUpdate()
@@ -75,8 +97,11 @@ public class ZombieController : MonoBehaviour
         // Direction of target
         Vector2 targetDirection = ((Vector2)target.position - zombieRB.position).normalized;
 
-        // Determine if a new path should be calculated
-        if (Time.fixedTime > 0 && (path == null || path.Count == 0 || zombieRB.position == (Vector2)path[0] + new Vector2(0.5f, 0.5f)))
+        // A new path should be calculated if the following 3 conditions are true:
+        // - The tilemap has had time to load in
+        // - The path is null, the path has a length of 0, or the zombie has reached the first point along the path
+        // - The target is detected
+        if (Time.fixedTime > 0 && (path == null || path.Count == 0 || zombieRB.position == (Vector2)path[0] + new Vector2(0.5f, 0.5f)) && targetDetected)
         {
             // Calculate a path from the zombie to the target
             path = pathfinder.FindPath(new Vector2Int(Convert.ToInt32(zombieRB.position.x - 0.5f), Convert.ToInt32(zombieRB.position.y - 0.5f)), new Vector2Int(Convert.ToInt32(target.position.x - 0.5f), Convert.ToInt32(target.position.y - 0.5f)), wallTilemap);
@@ -104,12 +129,16 @@ public class ZombieController : MonoBehaviour
             }
         }
         
-        // Move
-        zombieRB.MovePosition(Vector2.MoveTowards(zombieRB.position, destination, moveSpeed * Time.fixedDeltaTime));
+        // Move and face the target if the target is detected
+        if (targetDetected)
+        {
+            // Move
+            zombieRB.MovePosition(Vector2.MoveTowards(zombieRB.position, destination, moveSpeed * Time.fixedDeltaTime));
 
-        // Face the target
-        float angle = CalculateAngle(targetDirection);
-        transform.rotation = RotateBy(angle);
+            // Face the target
+            float angle = CalculateAngle(targetDirection);
+            transform.rotation = RotateBy(angle);
+        }
     }
     
     //~(Helper Methods)~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
