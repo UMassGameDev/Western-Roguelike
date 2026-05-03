@@ -3,28 +3,35 @@
 * Author(s):   Alexander Art
 * 
 * Description:
-*    Very simple script to keep track of and calculate the day/night cycle.
-*    Also controls global day/night lighting, but this should probably be moved to a different script.
+*    Script to keep track of and calculate the day/night cycle.
 *******************************************************/
 
 using UnityEngine;
-using UnityEngine.Rendering.Universal;
 
 public class DayNightHandler : MonoBehaviour
 {
     [SerializeField, Tooltip("Time in seconds for a full day/night cycle.")]
     private int maxTime;
 
+    public static DayNightHandler instance;
     private float time = 0; // Current time of day in seconds
-    private int day = 1; // Current day number (each day that passes increments this number by 1)
+    private int day = 1; // Current day count (each day that passes increments this number by 1)
 
-    private Light2D globalLight;
-
-    void Awake()
+    private void Awake()
     {
-        globalLight = GetComponent<Light2D>();
+        // Have only 1 DayNightHandler at a time and have it persist between scenes
+        if (instance == null)
+        {
+            DontDestroyOnLoad(this.gameObject);
+            instance = this;
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
     }
 
+    // Update is called once per frame
     void Update()
     {
         time += Time.deltaTime;
@@ -33,14 +40,6 @@ public class DayNightHandler : MonoBehaviour
         {
             time -= maxTime;
             ++day;
-        }
-
-        if (IsDay())
-        {
-            globalLight.color = new Color(1.0f, 1.0f, 1.0f, 1.0f);
-        }
-        else {
-            globalLight.color = new Color(0.8f, 0.8f, 0.9f, 1.0f);
         }
     }
 
@@ -54,6 +53,16 @@ public class DayNightHandler : MonoBehaviour
         time = newTime;
     }
 
+    public int GetDayCount()
+    {
+        return day;
+    }
+
+    public void SetDayCount(int newDay)
+    {
+        day = newDay;
+    }
+
     public bool IsDay()
     {
         return time < maxTime / 2.0f;
@@ -64,13 +73,8 @@ public class DayNightHandler : MonoBehaviour
         return !IsDay();
     }
 
-    public int GetDayNumber()
+    public float GetCyclePercentage()
     {
-        return day;
-    }
-
-    public void SetDayNumber(int newDay)
-    {
-        day = newDay;
+        return time / maxTime;
     }
 }

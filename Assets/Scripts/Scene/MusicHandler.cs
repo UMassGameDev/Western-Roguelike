@@ -70,7 +70,7 @@ public class MusicHandler : MonoBehaviour
             if (!audioSource.isPlaying)
             {
                 audioSource.volume = volume;
-                audioSource.clip = dayMusic[(dayNightHandler.GetDayNumber() - 1) % dayMusic.Count];
+                audioSource.clip = dayMusic[(dayNightHandler.GetDayCount() - 1) % dayMusic.Count];
                 audioSource.Play();
             }
         }
@@ -98,7 +98,7 @@ public class MusicHandler : MonoBehaviour
             if (!audioSource.isPlaying)
             {
                 audioSource.volume = volume;
-                audioSource.clip = nightMusic[(dayNightHandler.GetDayNumber() - 1) % nightMusic.Count];
+                audioSource.clip = nightMusic[(dayNightHandler.GetDayCount() - 1) % nightMusic.Count];
                 audioSource.Play();
             }
         }
