@@ -733,6 +733,53 @@ Transform:
   - {fileID: 615603968}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &776765330
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 776765332}
+  - component: {fileID: 776765331}
+  m_Layer: 0
+  m_Name: Night Wave Spawner
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &776765331
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 776765330}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6438bb1956da27e429e752686e6b3b97, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::NightWaveSpawner
+  wallTilemap: {fileID: 598603759}
+  floorTilemap: {fileID: 1797136888}
+  bountyHunterPrefab: {fileID: 5813641010066698784, guid: 90fdcc7a9234f0348be1d161dee4681c, type: 3}
+--- !u!4 &776765332
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 776765330}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1213993815 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 6622966133622132808, guid: 2bcbb7500a891274ab893eaf5c028db3, type: 3}
@@ -1596,3 +1643,4 @@ SceneRoots:
   - {fileID: 1234535224}
   - {fileID: 2483766438372452734}
   - {fileID: 2197896439438634670}
+  - {fileID: 776765332}
