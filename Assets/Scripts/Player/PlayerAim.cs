@@ -9,6 +9,8 @@ using UnityEngine;
 /// </remarks>
 public class PlayerAim : MonoBehaviour
 {
+    [SerializeField] private Transform gun;
+
     // Updates transform.rotation to point at the mouse every frame:
     void Update()
     {
@@ -17,6 +19,20 @@ public class PlayerAim : MonoBehaviour
 
         float angle = CalculateAngle(mouseDir);
         transform.rotation = RotateBy(angle);
+
+        FlipGun(mouseDir);
+    }
+
+    void FlipGun(Vector3 dir)
+    {
+        Vector3 scale = gun.localScale;
+
+        if (dir.x > 0)
+            scale.y = -1;
+        else 
+            scale.y = 1;
+
+        gun.localScale = scale;
     }
 
     //~(Helper Methods)~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

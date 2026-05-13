@@ -38,6 +38,8 @@ public class PlayerShoot : MonoBehaviour
     AudioClip shootSound;
     [SerializeField, Tooltip("Where <shootSound> is played.")]
     AudioSource audioSource;
+    [SerializeField, Tooltip("The animator that controls gun animations.")]
+    Animator gunAnimator;
 
     // Internal variables:
     float lastShotTime;
@@ -52,6 +54,8 @@ public class PlayerShoot : MonoBehaviour
         // If mouse was clicked and Shoot() is not on cooldown, shoot.
         if (mouseClicked && !onCooldown)
         {
+            gunAnimator.ResetTrigger("firedShot");
+            gunAnimator.SetTrigger("firedShot");
             Shoot();
             lastShotTime = Time.time;  // Reset cooldown.
         }
