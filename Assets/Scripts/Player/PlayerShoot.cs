@@ -32,6 +32,10 @@ public class PlayerShoot : MonoBehaviour
     float cooldown = 0.5f;
     [SerializeField, Tooltip("Bullet speed.")] 
     float bulletSpeed = 60f;
+    [SerializeField, Tooltip("Bullet damage.")] 
+    int bulletDamage = 1;
+    [SerializeField, Tooltip("Maximum number of enemies the bullet can hit before getting destroyed.")]
+    int bulletPiercing = 1;
 
     [Header("Audio")]
     [SerializeField, Tooltip("The sound played on Shoot().")]
@@ -68,6 +72,8 @@ public class PlayerShoot : MonoBehaviour
         GameObject bullet = Instantiate(bulletObj, transform.position, muzzle.rotation);
         Bullet bulletScript = bullet.GetComponent<Bullet>();
         bulletScript.SetVelocity(-muzzle.up * bulletSpeed);
+        bulletScript.SetDamage(bulletDamage);
+        bulletScript.SetPiercing(bulletPiercing);
         bulletScript.SetPlayerBullet(true);
 
         bool soundInitialized = audioSource != null && shootSound != null;

@@ -436,6 +436,8 @@ MonoBehaviour:
   muzzle: {fileID: 4455725133419971136}
   cooldown: 0.5
   bulletSpeed: 60
+  bulletDamage: 1
+  bulletPiercing: 1
   shootSound: {fileID: 8300000, guid: cac629d478abb654bafd3f1c39acc3e7, type: 3}
   audioSource: {fileID: 7551574136678995364}
   gunAnimator: {fileID: 463797740037372244}
@@ -510,7 +512,7 @@ GameObject:
   - component: {fileID: 6440073565985442210}
   m_Layer: 3
   m_Name: AimingArc
-  m_TagString: Player
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -546,4 +548,3 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerAim
   gun: {fileID: 7720469958751307457}
-  gunRenderer: {fileID: 180276931329766932}

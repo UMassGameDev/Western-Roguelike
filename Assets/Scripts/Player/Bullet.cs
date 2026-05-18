@@ -12,9 +12,6 @@ using UnityEngine;
 
 public class Bullet : MonoBehaviour
 {
-    [SerializeField, Tooltip("How much damage the bullet does.")] 
-    public int damage = 1;
-
     [SerializeField, Tooltip("Hit effect on collision.")] 
     private GameObject hitEffect;
 
@@ -22,6 +19,8 @@ public class Bullet : MonoBehaviour
     private bool playerBullet = false;
 
     private Vector3 velocity;
+    private int damage;
+    private int piercing; // Number of hits before the bullet is destroyed
 
     void FixedUpdate()
     {
@@ -37,22 +36,30 @@ public class Bullet : MonoBehaviour
                 // Show debug info
                 Debug.Log($"Bullet hit {hit.collider.gameObject.name} at {hit.point}");
                 Debug.DrawLine(this.transform.position, hit.point, Color.red, 100f);
-
-                // Temporarily instantiate the hit effect
-                GameObject effect = Instantiate(hitEffect, hit.point, Quaternion.identity);
-                Destroy(effect, 0.1f);
-
+                
                 // Check if the collided object has PlayerHealth
                 PlayerHealth playerHealth = hit.collider.gameObject.GetComponent<PlayerHealth>(); 
                 if (playerHealth != null)
                 {
                     // Damage the collided object
                     playerHealth.Damage(damage);
-                } 
+                }
+                else
+                {
+                    piercing = 0;
+                }
 
-                // Delete the bullet
-                Destroy(this.gameObject);
-                
+                --piercing;
+                if (piercing <= 0)
+                {
+                    // Temporarily instantiate the hit effect
+                    GameObject effect = Instantiate(hitEffect, hit.point, Quaternion.identity);
+                    Destroy(effect, 0.1f);
+
+                    // Delete the bullet
+                    Destroy(this.gameObject);
+                }
+
                 // End loop
                 break;
             }
@@ -63,10 +70,6 @@ public class Bullet : MonoBehaviour
                 Debug.Log($"Bullet hit {hit.collider.gameObject.name} at {hit.point}");
                 Debug.DrawLine(this.transform.position, hit.point, Color.red, 100f);
 
-                // Temporarily instantiate the hit effect
-                GameObject effect = Instantiate(hitEffect, hit.point, Quaternion.identity);
-                Destroy(effect, 0.1f);
-
                 // Check if the collided object has EnemyHealth
                 EnemyHealth enemyHealth = hit.collider.gameObject.GetComponent<EnemyHealth>(); 
                 if (enemyHealth != null)
@@ -74,9 +77,21 @@ public class Bullet : MonoBehaviour
                     // Damage the collided object
                     enemyHealth.Damage(damage);
                 }
+                else
+                {
+                    piercing = 0;
+                }
 
-                // Delete the bullet
-                Destroy(this.gameObject);
+                --piercing;
+                if (piercing <= 0)
+                {
+                    // Temporarily instantiate the hit effect
+                    GameObject effect = Instantiate(hitEffect, hit.point, Quaternion.identity);
+                    Destroy(effect, 0.1f);
+
+                    // Delete the bullet
+                    Destroy(this.gameObject);
+                }
                 
                 // End loop
                 break;
@@ -103,6 +118,20 @@ public class Bullet : MonoBehaviour
     public void SetVelocity(Vector3 newVelocity)
     {
         velocity = newVelocity;
+    }
+
+    //~(SetDamage)~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // Bullet damage is set from an external script
+    public void SetDamage(int newDamage)
+    {
+        damage = newDamage;
+    }
+
+    //~(SetPiercing)~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // Bullet piercing is set from an external script
+    public void SetPiercing(int newPiercing)
+    {
+        piercing = newPiercing;
     }
 
     //~(SetPlayerBullet)~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

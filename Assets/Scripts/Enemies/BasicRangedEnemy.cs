@@ -39,6 +39,8 @@ public class BasicRangedEnemy : MonoBehaviour
     float cooldown = 0.5f;
     [SerializeField, Tooltip("Bullet speed.")] 
     float bulletSpeed = 60f;
+    [SerializeField, Tooltip("Bullet damage.")] 
+    int bulletDamage = 1;
     [SerializeField, Tooltip("Maximum bullets fired before a reload is needed.")] 
     float chambers = 6f;
     [SerializeField, Tooltip("Time needed to reload.")] 
@@ -219,6 +221,8 @@ public class BasicRangedEnemy : MonoBehaviour
         GameObject bullet = Instantiate(bulletObj, transform.position, muzzle.rotation);
         Bullet bulletScript = bullet.GetComponent<Bullet>();
         bulletScript.SetVelocity(-muzzle.up * bulletSpeed);
+        bulletScript.SetDamage(bulletDamage);
+        bulletScript.SetPiercing(1);
         bulletScript.SetPlayerBullet(false);
 
         bool soundInitialized = audioSource != null && shootSound != null;
