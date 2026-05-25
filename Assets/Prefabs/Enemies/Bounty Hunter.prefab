@@ -44,7 +44,7 @@ GameObject:
   - component: {fileID: 3444483205281809906}
   - component: {fileID: 1914230770485312235}
   - component: {fileID: 2411512421995923596}
-  - component: {fileID: 8878890528492251914}
+  - component: {fileID: 5422854497235684432}
   m_Layer: 7
   m_Name: Bounty Hunter
   m_TagString: Untagged
@@ -118,7 +118,7 @@ SpriteRenderer:
   m_SortingLayer: 2
   m_SortingOrder: 0
   m_MaskInteraction: 0
-  m_Sprite: {fileID: -1942577732, guid: ecac8e5c892138b4981b83c9e47bb490, type: 3}
+  m_Sprite: {fileID: 948173459, guid: ecac8e5c892138b4981b83c9e47bb490, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -213,7 +213,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e00e5e5e95720bd4ca1b15dde793ed7d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHealth: 1
+  maxHealth: 2
   OnDeath:
     m_PersistentCalls:
       m_Calls:
@@ -229,7 +229,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
---- !u!114 &8878890528492251914
+--- !u!114 &5422854497235684432
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -238,12 +238,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 5813641010066698784}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9c5e4400eaf20914680ce78f5e133e6f, type: 3}
+  m_Script: {fileID: 11500000, guid: 03e6152639cbf1443b183faffdef23b6, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: 
-  moveSpeed: 2
-  detectionRadius: 10
-  persistentRadius: 20
+  m_EditorClassIdentifier: Assembly-CSharp::BountyHunterController
+  moveSpeed: 3
+  detectionRadius: 12
+  persistentRadius: 30
   farRange: 5
   closeRange: 3
   bulletObj: {fileID: 1548784170395063139, guid: 3b86f00c3c96cfc43bde2a3886234bf7, type: 3}
@@ -252,6 +252,7 @@ MonoBehaviour:
   reactionTime: 0.3
   cooldown: 0.5
   bulletSpeed: 60
+  bulletDamage: 1
   chambers: 6
   reloadTime: 3
   shootSound: {fileID: 8300000, guid: cac629d478abb654bafd3f1c39acc3e7, type: 3}

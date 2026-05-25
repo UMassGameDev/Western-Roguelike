@@ -251,6 +251,28 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
+    - serializedVersion: 2
+      name: Western-Roguelike-placeholder_6
+      rect:
+        serializedVersion: 2
+        x: 96
+        y: 0
+        width: 16
+        height: 16
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: aea95b9a21f0a6846a3282b1d0a83d81
+      internalID: 948173459
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     customData: 
     physicsShape: []
@@ -275,6 +297,7 @@ TextureImporter:
       Western-Roguelike-placeholder_3: -1942577732
       Western-Roguelike-placeholder_4: -1208978908
       Western-Roguelike-placeholder_5: -2115102809
+      Western-Roguelike-placeholder_6: 948173459
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

@@ -1,9 +1,9 @@
 /*******************************************************
-* Script:      BasicRangedEnemy.cs
+* Script:      BountyHunterController.cs
 * Author(s):   Alexander Art, Nicholas Johnson
 * 
 * Description:
-*    Implements behavior for a ranged enemy.
+*    Implements behavior for a bounty hunter ranged enemy.
 *******************************************************/
 
 using System;
@@ -11,19 +11,19 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
-public class BasicRangedEnemy : MonoBehaviour
+public class BountyHunterController : MonoBehaviour
 {
     [Header("Movement")]
     [SerializeField, Tooltip("Distance moved per frame in meters per second.")]
-    private float moveSpeed = 2f;
+    private float moveSpeed = 3f;
     [SerializeField, Tooltip("Distance the target can be detected when there is a clear line of sight.")]
     private float detectionRadius = 12f;
     [SerializeField, Tooltip("Distance the target will remain detected.")]
-    private float persistentRadius = 20f;
-    [SerializeField, Tooltip("Min distance to the target where the enemy will try to get closer.")]
-    private float farRange = 5f;
-    [SerializeField, Tooltip("Max distance to the target where the enemy will try to get further away.")]
+    private float persistentRadius = 30f;
+    [SerializeField, Tooltip("Min distance to the player the enemy will try to go.")]
     private float closeRange = 3f;
+    [SerializeField, Tooltip("Max distance to the player the enemy will try to go.")]
+    private float farRange = 5f;
 
     [Header("Shooting")]
     [SerializeField, Tooltip("The bullet prefab.")]
@@ -55,9 +55,11 @@ public class BasicRangedEnemy : MonoBehaviour
     private Transform target; // The player is the enemy's target and this gets assigned automatically
     private Camera cameraInstance;
 
-    private Pathfinder pathfinder; // Alternative implementation: each BasicRangedEnemy could use its own pathfinder object
+    private Pathfinder pathfinder; // Alternative implementation: each enemy could use its own pathfinder object
     private Tilemap wallTilemap;
     private List<Vector2Int> path;
+    private Vector2 destination = new Vector2(0f, 0f); // It's not letting me set it to null. Very annoying.
+    private bool destSet = false; // This variable is used because it wasn't letting me set destination to null
 
     private bool lineOfSight = false;
     private bool targetDetected = false;
@@ -166,44 +168,64 @@ public class BasicRangedEnemy : MonoBehaviour
         Vector2 targetDirection = ((Vector2)target.position - enemyRB.position).normalized;
         float targetDistance = Vector2.Distance(enemyRB.position, target.position);
 
-        // Calculate a new path if the tilemap has had time to load in and the target is detected
-        if (Time.fixedTime > 0 && targetDetected)
+        // Calculate a new destination if there is no path yet, the tilemap has had time to load in, and the target is detected
+        if (path == null && Time.fixedTime > 0 && targetDetected)
         {
-            // Calculate a path from the enemy to the target
-            path = pathfinder.FindPath(new Vector2Int(Convert.ToInt32(enemyRB.position.x - 0.5f), Convert.ToInt32(enemyRB.position.y - 0.5f)), new Vector2Int(Convert.ToInt32(target.position.x - 0.5f), Convert.ToInt32(target.position.y - 0.5f)), wallTilemap);
+            destination = CalculateNewDestination();
+            destSet = true;
         }
 
-        // Move toward the target if the target is detected and the enemy is too far from the target
-        if (targetDetected && targetDistance > farRange)
-        {
-            // The default direction to move in is directly toward the player
-            Vector2 destination = target.position;
-
-            // If a path is found, move along the path
-            if (path != null && path.Count > 0)
-            {
-                // Calculate where to move to based on the path
-                destination = (Vector2)path[0] + new Vector2(0.5f, 0.5f);
-
-                // Sometimes the current position of the enemy is part of the path. Use the second point of the path if that is the case.
-                if (destination == enemyRB.position && path.Count >= 2)
-                {
-                    destination = (Vector2)path[1] + new Vector2(0.5f, 0.5f);
-                }
-            }
-
-            // Move
-            enemyRB.MovePosition(Vector2.MoveTowards(enemyRB.position, destination, moveSpeed * Time.fixedDeltaTime));
-        }
-
-        // Move away from the target if the following 3 conditions are true:
+        // Pick a new destination if the following 3 conditions are true:
         // - There is a valid line of sight
         // - The target is detected
-        // - The enemy is too close to the target
-        if (lineOfSight && targetDetected && targetDistance < closeRange)
+        // - The destination is too far from the target
+        if (lineOfSight && targetDetected && path != null && path.Count > 0 && Vector2.Distance(path[path.Count - 1], new Vector2(target.position.x, target.position.y)) > farRange)
         {
-            enemyRB.MovePosition(Vector2.MoveTowards(enemyRB.position, target.position, -moveSpeed * Time.fixedDeltaTime));
+            destination = CalculateNewDestination();
+            destSet = true;
         }
+
+        // Pick a new destination if the following 3 conditions are true:
+        // - There is a valid line of sight
+        // - The target is detected
+        // - The destination is too close to the target
+        if (lineOfSight && targetDetected && path != null && path.Count > 0 && Vector2.Distance(path[path.Count - 1], new Vector2(target.position.x, target.position.y)) > closeRange)
+        {
+            destination = CalculateNewDestination();
+            destSet = true;
+        }
+
+        // Pick a new destination if the enemy is at its destination
+        if (path != null && path.Count > 0 && (Vector2)path[0] + new Vector2(0.5f, 0.5f) == enemyRB.position)
+        {
+            destination = CalculateNewDestination();
+            destSet = true;
+        }
+
+        // Calculate the path based on the destination
+        if (destSet)
+        {
+            path = pathfinder.FindPath(new Vector2Int(Convert.ToInt32(enemyRB.position.x - 0.5f), Convert.ToInt32(enemyRB.position.y - 0.5f)), new Vector2Int(Convert.ToInt32(destination.x - 0.5f), Convert.ToInt32(destination.y - 0.5f)), wallTilemap);
+        }
+
+        // The default direction to move in is directly toward the player
+        Vector2 localDestination = target.position;
+
+        // If a path is found, move along the path
+        if (path != null && path.Count > 0)
+        {
+            // Calculate where to move to based on the path
+            localDestination = (Vector2)path[0] + new Vector2(0.5f, 0.5f);
+
+            // Sometimes the current position of the enemy is part of the path. Use the second point of the path if that is the case.
+            if (localDestination == enemyRB.position && path.Count >= 2)
+            {
+                localDestination = (Vector2)path[1] + new Vector2(0.5f, 0.5f);
+            }
+        }
+
+        // Move
+        enemyRB.MovePosition(Vector2.MoveTowards(enemyRB.position, localDestination, moveSpeed * Time.fixedDeltaTime));
 
         // Face the target if it is detected
         if (targetDetected)
@@ -211,6 +233,38 @@ public class BasicRangedEnemy : MonoBehaviour
             float angle = CalculateAngle(targetDirection);
             transform.rotation = RotateBy(angle);
         }
+    }
+
+    void OnDrawGizmos()
+    {
+        if (path == null || path.Count < 2)
+            return;
+
+        Gizmos.color = Color.red;
+
+        for (int i = 0; i < path.Count - 1; i++)
+        {
+            Vector3 current = new Vector3(path[i].x + 0.5f, path[i].y + 0.5f, 0f);
+            Vector3 next = new Vector3(path[i + 1].x + 0.5f, path[i + 1].y + 0.5f, 0f);
+
+            Gizmos.DrawLine(current, next);
+        }
+    }
+
+    Vector2 CalculateNewDestination()
+    {
+        // Find a random angle and distance from the target
+        float dist = UnityEngine.Random.Range(closeRange, farRange);
+        float angle = UnityEngine.Random.Range(0f, Mathf.PI * 2f);
+        // Repeat while the randomly selected position is not empty
+        while (wallTilemap.GetTile(new Vector3Int(Convert.ToInt32(target.position.x + dist * Mathf.Cos(angle)), Convert.ToInt32(target.position.y + dist * Mathf.Sin(angle)), 0)) != null)
+        {
+            // Calculate a new random position
+            dist = UnityEngine.Random.Range(closeRange, farRange);
+            angle = UnityEngine.Random.Range(0f, Mathf.PI * 2f);
+        }
+        // Set the destination to the randomly selected position
+        return new Vector2(target.position.x + dist * Mathf.Cos(angle), target.position.y + dist * Mathf.Sin(angle));
     }
 
     void Shoot()
