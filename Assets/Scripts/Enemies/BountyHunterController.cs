@@ -15,7 +15,7 @@ public class BountyHunterController : MonoBehaviour
 {
     [Header("Movement")]
     [SerializeField, Tooltip("Distance moved per frame in meters per second.")]
-    private float moveSpeed = 3f;
+    private float moveSpeed = 4f;
     [SerializeField, Tooltip("Distance the target can be detected when there is a clear line of sight.")]
     private float detectionRadius = 12f;
     [SerializeField, Tooltip("Distance the target will remain detected.")]
@@ -23,7 +23,7 @@ public class BountyHunterController : MonoBehaviour
     [SerializeField, Tooltip("Min distance to the player the enemy will try to go.")]
     private float closeRange = 3f;
     [SerializeField, Tooltip("Max distance to the player the enemy will try to go.")]
-    private float farRange = 5f;
+    private float farRange = 6f;
 
     [Header("Shooting")]
     [SerializeField, Tooltip("The bullet prefab.")]
@@ -60,6 +60,9 @@ public class BountyHunterController : MonoBehaviour
     private List<Vector2Int> path;
     private Vector2 destination = new Vector2(0f, 0f); // It's not letting me set it to null. Very annoying.
     private bool destSet = false; // This variable is used because it wasn't letting me set destination to null
+
+    private int cycle = 0;
+    private float offset;
 
     private bool lineOfSight = false;
     private bool targetDetected = false;
@@ -175,40 +178,13 @@ public class BountyHunterController : MonoBehaviour
             destSet = true;
         }
 
-        // Pick a new destination if the following 3 conditions are true:
-        // - There is a valid line of sight
-        // - The target is detected
-        // - The destination is too far from the target
-        if (lineOfSight && targetDetected && path != null && path.Count > 0 && Vector2.Distance(path[path.Count - 1], new Vector2(target.position.x, target.position.y)) > farRange)
-        {
-            destination = CalculateNewDestination();
-            destSet = true;
-        }
-
-        // Pick a new destination if the following 3 conditions are true:
-        // - There is a valid line of sight
-        // - The target is detected
-        // - The destination is too close to the target
-        if (lineOfSight && targetDetected && path != null && path.Count > 0 && Vector2.Distance(path[path.Count - 1], new Vector2(target.position.x, target.position.y)) > closeRange)
-        {
-            destination = CalculateNewDestination();
-            destSet = true;
-        }
-
-        // Pick a new destination if the enemy is at its destination
-        if (path != null && path.Count > 0 && (Vector2)path[0] + new Vector2(0.5f, 0.5f) == enemyRB.position)
-        {
-            destination = CalculateNewDestination();
-            destSet = true;
-        }
-
         // Calculate the path based on the destination
         if (destSet)
         {
             path = pathfinder.FindPath(new Vector2Int(Convert.ToInt32(enemyRB.position.x - 0.5f), Convert.ToInt32(enemyRB.position.y - 0.5f)), new Vector2Int(Convert.ToInt32(destination.x - 0.5f), Convert.ToInt32(destination.y - 0.5f)), wallTilemap);
         }
 
-        // The default direction to move in is directly toward the player
+        // Calculate where to move to based on the path
         Vector2 localDestination = target.position;
 
         // If a path is found, move along the path
@@ -222,6 +198,11 @@ public class BountyHunterController : MonoBehaviour
             {
                 localDestination = (Vector2)path[1] + new Vector2(0.5f, 0.5f);
             }
+        }
+        else
+        {
+            destination = CalculateNewDestination();
+            cycle = (cycle + 1) % 2;
         }
 
         // Move
@@ -253,18 +234,47 @@ public class BountyHunterController : MonoBehaviour
 
     Vector2 CalculateNewDestination()
     {
-        // Find a random angle and distance from the target
-        float dist = UnityEngine.Random.Range(closeRange, farRange);
-        float angle = UnityEngine.Random.Range(0f, Mathf.PI * 2f);
-        // Repeat while the randomly selected position is not empty
-        while (wallTilemap.GetTile(new Vector3Int(Convert.ToInt32(target.position.x + dist * Mathf.Cos(angle)), Convert.ToInt32(target.position.y + dist * Mathf.Sin(angle)), 0)) != null)
+        // If cycle is 0, move close to the target
+        // If cycle is 1 (or any other number), keep moving past the target
+        if (cycle == 0)
         {
-            // Calculate a new random position
-            dist = UnityEngine.Random.Range(closeRange, farRange);
-            angle = UnityEngine.Random.Range(0f, Mathf.PI * 2f);
+            // Get close to target
+            float dist = closeRange;
+            // Angle between bounty hunter and its target
+            float angle = Mathf.Atan2(target.position.y - enemyRB.position.y, target.position.x - enemyRB.position.x);
+            // +90 or -90 degree offset
+            offset = (UnityEngine.Random.Range(0, 2) - 0.5f) * Mathf.PI;
+            angle += offset;
+            // Failsafe for if the selected position is a wall tile
+            // Repeat while the randomly selected position is not empty
+            while (wallTilemap.GetTile(new Vector3Int(Convert.ToInt32(target.position.x + dist * Mathf.Cos(angle)), Convert.ToInt32(target.position.y + dist * Mathf.Sin(angle)), 0)) != null)
+            {
+                // Calculate a new random position
+                dist = UnityEngine.Random.Range(closeRange, farRange);
+                angle = UnityEngine.Random.Range(0f, Mathf.PI * 2f);
+            }
+            // Set the destination to the selected position
+            return new Vector2(target.position.x + dist * Mathf.Cos(angle), target.position.y + dist * Mathf.Sin(angle));
         }
-        // Set the destination to the randomly selected position
-        return new Vector2(target.position.x + dist * Mathf.Cos(angle), target.position.y + dist * Mathf.Sin(angle));
+        else
+        {
+            // Get close to target
+            float dist = farRange;
+            // Angle between bounty hunter and its target
+            float angle = Mathf.Atan2(target.position.y - enemyRB.position.y, target.position.x - enemyRB.position.x);
+            // Keep moving past the player
+            angle += offset;
+            // Failsafe for if the selected position is a wall tile
+            // Repeat while the randomly selected position is not empty
+            while (wallTilemap.GetTile(new Vector3Int(Convert.ToInt32(target.position.x + dist * Mathf.Cos(angle)), Convert.ToInt32(target.position.y + dist * Mathf.Sin(angle)), 0)) != null)
+            {
+                // Calculate a new random position
+                dist = UnityEngine.Random.Range(closeRange, farRange);
+                angle = UnityEngine.Random.Range(0f, Mathf.PI * 2f);
+            }
+            // Set the destination to the selected position
+            return new Vector2(target.position.x + dist * Mathf.Cos(angle), target.position.y + dist * Mathf.Sin(angle));
+        }
     }
 
     void Shoot()
