@@ -67,7 +67,7 @@ public class PlayerShoot : MonoBehaviour
 
     void Shoot()
     {
-        GameObject flare = Instantiate(flareObj, muzzle.position, muzzle.rotation);
+        GameObject flare = Instantiate(flareObj, muzzle.position, muzzle.rotation, muzzle);
         Destroy(flare, 0.1f);
         GameObject bullet = Instantiate(bulletObj, transform.position, muzzle.rotation);
         Bullet bulletScript = bullet.GetComponent<Bullet>();
@@ -75,6 +75,9 @@ public class PlayerShoot : MonoBehaviour
         bulletScript.SetDamage(bulletDamage);
         bulletScript.SetPiercing(bulletPiercing);
         bulletScript.SetPlayerBullet(true);
+        // The player's bullet appears in front of the player for a frame, so this fixes that.
+        // The bullet script will automatically reenables its renderer after 1 frame.
+        bulletScript.GetComponent<Renderer>().enabled = false;
 
         bool soundInitialized = audioSource != null && shootSound != null;
         if (soundInitialized) { PlaySound(); }

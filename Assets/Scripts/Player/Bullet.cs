@@ -22,8 +22,19 @@ public class Bullet : MonoBehaviour
     private int damage;
     private int piercing; // Number of hits before the bullet is destroyed
 
+    // Keeps track of how many physics frames this bullet has been alive
+    private int framesAlive = 0;
+
     void FixedUpdate()
     {
+        // Make the player's bullet visible after 1 frame.
+        // For context: the player's shoot script spawns in the bullet directly on top of the player, so
+        // the bullet is invisible initially and this script makes it visible after the first frame.
+        if (framesAlive >= 1)
+        {
+            this.GetComponent<Renderer>().enabled = true;
+        }
+
         // Raycast between current position and next position
         RaycastHit2D[] hits = Physics2D.RaycastAll(this.transform.position, velocity.normalized, (velocity * Time.fixedDeltaTime).magnitude);
 
@@ -111,6 +122,8 @@ public class Bullet : MonoBehaviour
 
         // Update position
         this.transform.position += velocity * Time.fixedDeltaTime;
+
+        framesAlive++;
     }
     
     //~(SetVelocity)~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
