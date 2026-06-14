@@ -55,8 +55,8 @@ public class PlayerShoot : MonoBehaviour
         bool mouseClicked = Input.GetMouseButton(0);
         bool onCooldown = Time.time <= lastShotTime + cooldown;
 
-        // If mouse was clicked and Shoot() is not on cooldown, shoot.
-        if (mouseClicked && !onCooldown)
+        // If mouse was clicked, Shoot() is not on cooldown, and the game is not paused, shoot.
+        if (mouseClicked && !onCooldown && Time.timeScale != 0.0f)
         {
             gunAnimator.ResetTrigger("firedShot");
             gunAnimator.SetTrigger("firedShot");

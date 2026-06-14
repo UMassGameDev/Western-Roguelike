@@ -11,16 +11,19 @@ public class PlayerAim : MonoBehaviour
 {
     [SerializeField] private Transform gun;
 
-    // Updates transform.rotation to point at the mouse every frame:
+    // Updates transform.rotation to point at the mouse every frame (unless paused)
     void Update()
     {
-        Vector3 mousePos = MousePosition();
-        Vector3 mouseDir = MouseDirection(mousePos);
+        if (Time.timeScale != 0.0f)
+        {
+            Vector3 mousePos = MousePosition();
+            Vector3 mouseDir = MouseDirection(mousePos);
 
-        float angle = CalculateAngle(mouseDir);
-        transform.rotation = RotateBy(angle);
+            float angle = CalculateAngle(mouseDir);
+            transform.rotation = RotateBy(angle);
 
-        FlipGun(mouseDir);
+            FlipGun(mouseDir);
+        }
     }
 
     void FlipGun(Vector3 dir)
