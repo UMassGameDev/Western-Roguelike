@@ -60,6 +60,7 @@ public class BountyHunterController : MonoBehaviour
     private List<Vector2Int> path;
     private Vector2 destination = new Vector2(0f, 0f); // It's not letting me set it to null. Very annoying.
     private bool destSet = false; // This variable is used because it wasn't letting me set destination to null
+    private Vector2Int prevTargetPosition;
 
     private int cycle = 0;
     private float offset;
@@ -170,6 +171,26 @@ public class BountyHunterController : MonoBehaviour
 
         Vector2 targetDirection = ((Vector2)target.position - enemyRB.position).normalized;
         float targetDistance = Vector2.Distance(enemyRB.position, target.position);
+        Vector2Int targetPosition = new Vector2Int(Convert.ToInt32(target.position.x - 0.5f), Convert.ToInt32(target.position.y - 0.5f));
+
+        // If the target moves to a different tile, move the destination
+        if (prevTargetPosition != null && destSet == true && targetPosition != prevTargetPosition)
+        {
+            int dx = targetPosition.x - prevTargetPosition.x;
+            int dy = targetPosition.y - prevTargetPosition.y;
+            Vector2 newDestination = destination + new Vector2(dx, dy);
+            // Move the destination if it can be moved to match the target's movement
+            // If the destination being moved would cause it to collide with a wall, then calculate a new destination
+            if (wallTilemap.GetTile(new Vector3Int(Convert.ToInt32(newDestination.x), Convert.ToInt32(newDestination.y), 0)) == null)
+            {
+                destination = newDestination;
+            }
+            else
+            {
+                destination = CalculateNewDestination();
+                destSet = true;
+            }
+        }
 
         // Calculate a new destination if there is no path yet, the tilemap has had time to load in, and the target is detected
         if (path == null && Time.fixedTime > 0 && targetDetected)
@@ -184,10 +205,20 @@ public class BountyHunterController : MonoBehaviour
             path = pathfinder.FindPath(new Vector2Int(Convert.ToInt32(enemyRB.position.x - 0.5f), Convert.ToInt32(enemyRB.position.y - 0.5f)), new Vector2Int(Convert.ToInt32(destination.x - 0.5f), Convert.ToInt32(destination.y - 0.5f)), wallTilemap);
         }
 
-        // Calculate where to move to based on the path
-        Vector2 localDestination = target.position;
+        // If the player has been detected, the default direction is toward the player
+        // If the player has not been detected, then the default direction is to not move
+        Vector2 localDestination;
+        if (targetDetected)
+        {
+            localDestination = target.position;
+        }
+        else
+        {
+            localDestination = enemyRB.position;
+        }
 
         // If a path is found, move along the path
+        // If the path is not found, but there is supposed to be one, assume it has been completed, so calculate a new path
         if (path != null && path.Count > 0)
         {
             // Calculate where to move to based on the path
@@ -199,7 +230,7 @@ public class BountyHunterController : MonoBehaviour
                 localDestination = (Vector2)path[1] + new Vector2(0.5f, 0.5f);
             }
         }
-        else
+        else if (destSet == true)
         {
             destination = CalculateNewDestination();
             cycle = (cycle + 1) % 2;
@@ -214,6 +245,8 @@ public class BountyHunterController : MonoBehaviour
             float angle = CalculateAngle(targetDirection);
             transform.rotation = RotateBy(angle);
         }
+
+        prevTargetPosition = new Vector2Int(Convert.ToInt32(target.position.x - 0.5f), Convert.ToInt32(target.position.y - 0.5f));
     }
 
     void OnDrawGizmos()
