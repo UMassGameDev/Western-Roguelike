@@ -241,20 +241,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 03e6152639cbf1443b183faffdef23b6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BountyHunterController
-  moveSpeed: 4
+  moveSpeed: 5
   detectionRadius: 12
   persistentRadius: 30
-  closeRange: 3
+  closeRange: 1
   farRange: 6
-  bulletObj: {fileID: 1548784170395063139, guid: 3b86f00c3c96cfc43bde2a3886234bf7, type: 3}
-  flareObj: {fileID: 5832922978901417772, guid: fc6664f3f32ca0340b0444a806874dd5, type: 3}
+  bulletObj: {fileID: 1548784170395063139, guid: 8389e4b733efd1c43b53a62f47b16fff, type: 3}
   muzzle: {fileID: 8679253230996936427}
   reactionTime: 0.3
-  cooldown: 0.5
-  bulletSpeed: 60
+  cooldown: 1
   bulletDamage: 1
-  chambers: 6
-  reloadTime: 3
+  chambers: 2
+  reloadTime: 1
   shootSound: {fileID: 8300000, guid: cac629d478abb654bafd3f1c39acc3e7, type: 3}
   audioSource: {fileID: 7529072245145663537}
 --- !u!1 &8735350673127444064

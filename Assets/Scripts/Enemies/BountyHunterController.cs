@@ -15,35 +15,31 @@ public class BountyHunterController : MonoBehaviour
 {
     [Header("Movement")]
     [SerializeField, Tooltip("Distance moved per frame in meters per second.")]
-    private float moveSpeed = 4f;
+    private float moveSpeed = 5f;
     [SerializeField, Tooltip("Distance the target can be detected when there is a clear line of sight.")]
     private float detectionRadius = 12f;
     [SerializeField, Tooltip("Distance the target will remain detected.")]
     private float persistentRadius = 30f;
     [SerializeField, Tooltip("Min distance to the player the enemy will try to go.")]
-    private float closeRange = 3f;
+    private float closeRange = 1f;
     [SerializeField, Tooltip("Max distance to the player the enemy will try to go.")]
     private float farRange = 6f;
 
     [Header("Shooting")]
     [SerializeField, Tooltip("The bullet prefab.")]
     GameObject bulletObj;
-    [SerializeField, Tooltip("The muzzle flare prefab.")]
-    GameObject flareObj;
     [SerializeField, Tooltip("Where the bullet is spawned.")]
     Transform muzzle;
     [SerializeField, Tooltip("Delay between target detection and bullet firing."), Min(0f)]
     float reactionTime = 0.3f;
     [SerializeField, Tooltip("Time until next bullet can be shot."), Min(0f)]
-    float cooldown = 0.5f;
-    [SerializeField, Tooltip("Bullet speed.")] 
-    float bulletSpeed = 60f;
+    float cooldown = 1f;
     [SerializeField, Tooltip("Bullet damage.")] 
     int bulletDamage = 1;
     [SerializeField, Tooltip("Maximum bullets fired before a reload is needed.")] 
-    float chambers = 6f;
+    float chambers = 2f;
     [SerializeField, Tooltip("Time needed to reload.")] 
-    float reloadTime = 3f;
+    float reloadTime = 1f;
 
     [Header("Audio")]
     [SerializeField, Tooltip("The sound played on Shoot().")]
@@ -147,9 +143,9 @@ public class BountyHunterController : MonoBehaviour
             }
         }
 
-        // If the target is seen, the target is on sreen, the enemy had time to react,
+        // If the target is detected, the target is on sreen, the target is close enough, the enemy had time to react,
         // Shoot() is not on cooldown, reloading is not on cooldown, and the enemy has ammo, shoot.
-        if (targetDetected && lineOfSight && onScreen && Time.time > lastDetectionTime + reactionTime && Time.time > lastShotTime + cooldown && Time.time > lastReloadTime + reloadTime && ammo > 0)
+        if (targetDetected && onScreen && targetDistance < 1.5f && Time.time > lastDetectionTime + reactionTime && Time.time > lastShotTime + cooldown && Time.time > lastReloadTime + reloadTime && ammo > 0)
         {
             Shoot();
             lastShotTime = Time.time;  // Reset cooldown
@@ -312,13 +308,9 @@ public class BountyHunterController : MonoBehaviour
 
     void Shoot()
     {
-        GameObject flare = Instantiate(flareObj, muzzle.position, muzzle.rotation);
-        Destroy(flare, 0.1f);
-        GameObject bullet = Instantiate(bulletObj, transform.position, muzzle.rotation);
-        Bullet bulletScript = bullet.GetComponent<Bullet>();
-        bulletScript.SetVelocity(-muzzle.up * bulletSpeed);
+        GameObject bullet = Instantiate(bulletObj, transform.position, muzzle.rotation, muzzle);
+        ShotgunBullet bulletScript = bullet.GetComponent<ShotgunBullet>();
         bulletScript.SetDamage(bulletDamage);
-        bulletScript.SetPiercing(1);
         bulletScript.SetPlayerBullet(false);
 
         bool soundInitialized = audioSource != null && shootSound != null;
