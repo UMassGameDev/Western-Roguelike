@@ -14,8 +14,12 @@ using UnityEngine.Tilemaps;
 public class BountyHunterController : MonoBehaviour
 {
     [Header("Movement")]
-    [SerializeField, Tooltip("Distance moved per frame in meters per second.")]
-    private float moveSpeed = 5f;
+    [SerializeField, Tooltip("Maximum acceleration while speeding up.")]
+    private float maxAcceleration = 2f;
+    [SerializeField, Tooltip("Minimum speed in meters per second.")]
+    private float minSpeed = 1f;
+    [SerializeField, Tooltip("Maximum speed in meters per second.")]
+    private float maxSpeed = 7f;
     [SerializeField, Tooltip("Distance the target can be detected when there is a clear line of sight.")]
     private float detectionRadius = 12f;
     [SerializeField, Tooltip("Distance the target will remain detected.")]
@@ -60,6 +64,8 @@ public class BountyHunterController : MonoBehaviour
 
     private int cycle = 0;
     private float offset;
+    private float speed = 0;
+    private float initDistance; // Initial distance to destination
 
     private bool lineOfSight = false;
     private bool targetDetected = false;
@@ -232,8 +238,40 @@ public class BountyHunterController : MonoBehaviour
             cycle = (cycle + 1) % 2;
         }
 
-        // Move
-        enemyRB.MovePosition(Vector2.MoveTowards(enemyRB.position, localDestination, moveSpeed * Time.fixedDeltaTime));
+        // Update speed based on the progress through the current cycle
+        if (cycle == 0)
+        {
+            // Slow down when getting further from the target
+            float currentDistance = Vector2.Distance(enemyRB.position, destination);
+            speed = Mathf.Lerp(maxSpeed, minSpeed, (initDistance - currentDistance) / initDistance);
+            // Make it impossible for the player to outrun the enemy forever
+            initDistance *= 0.99f;
+        }
+        else
+        {
+            // Speed up when getting closer to the target
+            float currentDistance = Vector2.Distance(enemyRB.position, destination);
+            speed = Mathf.Lerp(minSpeed, maxSpeed, (initDistance - currentDistance) / initDistance);
+            // Make it impossible for the player to outrun the enemy forever
+            initDistance *= 1.01f;
+        }
+
+        // Cap speed
+        if (speed < minSpeed)
+        {
+            speed = minSpeed;
+        }
+        if (speed > maxSpeed)
+        {
+            speed = maxSpeed;
+        }
+
+        // If speed is valid
+        if (!float.IsNaN(speed))
+        {
+            // Move
+            enemyRB.MovePosition(Vector2.MoveTowards(enemyRB.position, localDestination, speed * Time.fixedDeltaTime));
+        }
 
         // Face the target if it is detected
         if (targetDetected)
@@ -264,7 +302,7 @@ public class BountyHunterController : MonoBehaviour
     Vector2 CalculateNewDestination()
     {
         // If cycle is 0, move close to the target
-        // If cycle is 1 (or any other number), keep moving past the target
+        // If cycle is 1 (or any other number), move past the target
         if (cycle == 0)
         {
             // Get close to target
@@ -282,8 +320,10 @@ public class BountyHunterController : MonoBehaviour
                 dist = UnityEngine.Random.Range(closeRange, farRange);
                 angle = UnityEngine.Random.Range(0f, Mathf.PI * 2f);
             }
-            // Set the destination to the selected position
-            return new Vector2(target.position.x + dist * Mathf.Cos(angle), target.position.y + dist * Mathf.Sin(angle));
+            // Return the selected position as the destination
+            Vector2 selectedPosition = new Vector2(target.position.x + dist * Mathf.Cos(angle), target.position.y + dist * Mathf.Sin(angle));
+            initDistance = Vector2.Distance(enemyRB.position, selectedPosition);
+            return selectedPosition;
         }
         else
         {
@@ -301,8 +341,10 @@ public class BountyHunterController : MonoBehaviour
                 dist = UnityEngine.Random.Range(closeRange, farRange);
                 angle = UnityEngine.Random.Range(0f, Mathf.PI * 2f);
             }
-            // Set the destination to the selected position
-            return new Vector2(target.position.x + dist * Mathf.Cos(angle), target.position.y + dist * Mathf.Sin(angle));
+            // Return the selected position as the destination
+            Vector2 selectedPosition = new Vector2(target.position.x + dist * Mathf.Cos(angle), target.position.y + dist * Mathf.Sin(angle));
+            initDistance = Vector2.Distance(enemyRB.position, selectedPosition);
+            return selectedPosition;
         }
     }
 
