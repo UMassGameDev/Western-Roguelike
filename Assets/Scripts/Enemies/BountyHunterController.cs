@@ -14,12 +14,10 @@ using UnityEngine.Tilemaps;
 public class BountyHunterController : MonoBehaviour
 {
     [Header("Movement")]
-    [SerializeField, Tooltip("Maximum acceleration while speeding up.")]
-    private float maxAcceleration = 2f;
-    [SerializeField, Tooltip("Minimum speed in meters per second.")]
-    private float minSpeed = 1f;
-    [SerializeField, Tooltip("Maximum speed in meters per second.")]
-    private float maxSpeed = 7f;
+    [SerializeField, Tooltip("Approximate speed of the enemy.")]
+    private float speed = 8f;
+    [SerializeField, Tooltip("Rate at which the speed can change.")]
+    private float turnSpeed = 3f;
     [SerializeField, Tooltip("Distance the target can be detected when there is a clear line of sight.")]
     private float detectionRadius = 12f;
     [SerializeField, Tooltip("Distance the target will remain detected.")]
@@ -64,7 +62,6 @@ public class BountyHunterController : MonoBehaviour
 
     private int cycle = 0;
     private float offset;
-    private float speed = 0;
     private float initDistance; // Initial distance to destination
 
     private bool lineOfSight = false;
@@ -181,16 +178,20 @@ public class BountyHunterController : MonoBehaviour
             int dx = targetPosition.x - prevTargetPosition.x;
             int dy = targetPosition.y - prevTargetPosition.y;
             Vector2 newDestination = destination + new Vector2(dx, dy);
-            // Move the destination if it can be moved to match the target's movement
-            // If the destination being moved would cause it to collide with a wall, then calculate a new destination
-            if (wallTilemap.GetTile(new Vector3Int(Convert.ToInt32(newDestination.x), Convert.ToInt32(newDestination.y), 0)) == null)
+            // If the destination is close to the player, only move the destination half of the time
+            if (cycle == 0 || (targetPosition.x + targetPosition.y) % 2 == 0)
             {
-                destination = newDestination;
-            }
-            else
-            {
-                destination = CalculateNewDestination();
-                destSet = true;
+                // Move the destination if it can be moved to match the target's movement
+                // If the destination being moved would cause it to collide with a wall, then calculate a new destination
+                if (wallTilemap.GetTile(new Vector3Int(Convert.ToInt32(newDestination.x), Convert.ToInt32(newDestination.y), 0)) == null)
+                {
+                    destination = newDestination;
+                }
+                else
+                {
+                    destination = CalculateNewDestination();
+                    destSet = true;
+                }
             }
         }
 
@@ -238,40 +239,9 @@ public class BountyHunterController : MonoBehaviour
             cycle = (cycle + 1) % 2;
         }
 
-        // Update speed based on the progress through the current cycle
-        if (cycle == 0)
-        {
-            // Slow down when getting further from the target
-            float currentDistance = Vector2.Distance(enemyRB.position, destination);
-            speed = Mathf.Lerp(maxSpeed, minSpeed, (initDistance - currentDistance) / initDistance);
-            // Make it impossible for the player to outrun the enemy forever
-            initDistance *= 0.99f;
-        }
-        else
-        {
-            // Speed up when getting closer to the target
-            float currentDistance = Vector2.Distance(enemyRB.position, destination);
-            speed = Mathf.Lerp(minSpeed, maxSpeed, (initDistance - currentDistance) / initDistance);
-            // Make it impossible for the player to outrun the enemy forever
-            initDistance *= 1.01f;
-        }
-
-        // Cap speed
-        if (speed < minSpeed)
-        {
-            speed = minSpeed;
-        }
-        if (speed > maxSpeed)
-        {
-            speed = maxSpeed;
-        }
-
-        // If speed is valid
-        if (!float.IsNaN(speed))
-        {
-            // Move
-            enemyRB.MovePosition(Vector2.MoveTowards(enemyRB.position, localDestination, speed * Time.fixedDeltaTime));
-        }
+        // Calculate how fast the enemy should be moving, but lerp toward it to avoid too sharp of turns (bounty hunter is on a horse)
+        Vector2 desiredVelocity = (localDestination - enemyRB.position).normalized * speed;
+        enemyRB.linearVelocity = Vector2.Lerp(enemyRB.linearVelocity, desiredVelocity, turnSpeed * Time.fixedDeltaTime);
 
         // Face the target if it is detected
         if (targetDetected)

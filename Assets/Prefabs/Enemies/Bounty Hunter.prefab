@@ -213,7 +213,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e00e5e5e95720bd4ca1b15dde793ed7d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHealth: 2
+  maxHealth: 5
   OnDeath:
     m_PersistentCalls:
       m_Calls:
@@ -241,7 +241,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 03e6152639cbf1443b183faffdef23b6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BountyHunterController
-  moveSpeed: 5
+  speed: 8
+  turnSpeed: 3
   detectionRadius: 12
   persistentRadius: 30
   closeRange: 1
