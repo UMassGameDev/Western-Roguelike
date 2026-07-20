@@ -17,7 +17,7 @@ public class BountyHunterController : MonoBehaviour
     [SerializeField, Tooltip("Approximate speed of the enemy.")]
     private float speed = 8f;
     [SerializeField, Tooltip("Rate at which the speed can change.")]
-    private float turnSpeed = 3f;
+    private float turnSpeed = 4f;
     [SerializeField, Tooltip("Distance the target can be detected when there is a clear line of sight.")]
     private float detectionRadius = 12f;
     [SerializeField, Tooltip("Distance the target will remain detected.")]
@@ -236,7 +236,6 @@ public class BountyHunterController : MonoBehaviour
         else if (destSet == true)
         {
             destination = CalculateNewDestination();
-            cycle = (cycle + 1) % 2;
         }
 
         // Calculate how fast the enemy should be moving, but lerp toward it to avoid too sharp of turns (bounty hunter is on a horse)
@@ -290,6 +289,8 @@ public class BountyHunterController : MonoBehaviour
                 dist = UnityEngine.Random.Range(closeRange, farRange);
                 angle = UnityEngine.Random.Range(0f, Mathf.PI * 2f);
             }
+            // Update cycle before returning
+            cycle = (cycle + 1) % 2;
             // Return the selected position as the destination
             Vector2 selectedPosition = new Vector2(target.position.x + dist * Mathf.Cos(angle), target.position.y + dist * Mathf.Sin(angle));
             initDistance = Vector2.Distance(enemyRB.position, selectedPosition);
@@ -297,12 +298,10 @@ public class BountyHunterController : MonoBehaviour
         }
         else
         {
-            // Get close to target
+            // Get far from target
             float dist = farRange;
-            // Angle between bounty hunter and its target
-            float angle = Mathf.Atan2(target.position.y - enemyRB.position.y, target.position.x - enemyRB.position.x);
             // Keep moving past the player
-            angle += offset;
+            float angle = Mathf.Atan2(enemyRB.linearVelocity.y, enemyRB.linearVelocity.x);
             // Failsafe for if the selected position is a wall tile
             // Repeat while the randomly selected position is not empty
             while (wallTilemap.GetTile(new Vector3Int(Convert.ToInt32(target.position.x + dist * Mathf.Cos(angle)), Convert.ToInt32(target.position.y + dist * Mathf.Sin(angle)), 0)) != null)
@@ -311,6 +310,8 @@ public class BountyHunterController : MonoBehaviour
                 dist = UnityEngine.Random.Range(closeRange, farRange);
                 angle = UnityEngine.Random.Range(0f, Mathf.PI * 2f);
             }
+            // Update cycle before returning
+            cycle = (cycle + 1) % 2;
             // Return the selected position as the destination
             Vector2 selectedPosition = new Vector2(target.position.x + dist * Mathf.Cos(angle), target.position.y + dist * Mathf.Sin(angle));
             initDistance = Vector2.Distance(enemyRB.position, selectedPosition);

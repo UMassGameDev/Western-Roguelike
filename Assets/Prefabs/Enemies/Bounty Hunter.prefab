@@ -242,7 +242,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BountyHunterController
   speed: 8
-  turnSpeed: 3
+  turnSpeed: 4
   detectionRadius: 12
   persistentRadius: 30
   closeRange: 1
