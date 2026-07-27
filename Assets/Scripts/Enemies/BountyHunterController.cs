@@ -15,9 +15,9 @@ public class BountyHunterController : MonoBehaviour
 {
     [Header("Movement")]
     [SerializeField, Tooltip("Approximate speed of the enemy.")]
-    private float speed = 8f;
+    private float speed = 12f;
     [SerializeField, Tooltip("Rate at which the speed can change.")]
-    private float turnSpeed = 4f;
+    private float turnSpeed = 2f;
     [SerializeField, Tooltip("Distance the target can be detected when there is a clear line of sight.")]
     private float detectionRadius = 12f;
     [SerializeField, Tooltip("Distance the target will remain detected.")]
@@ -59,6 +59,7 @@ public class BountyHunterController : MonoBehaviour
     private Vector2 destination = new Vector2(0f, 0f); // It's not letting me set it to null. Very annoying.
     private bool destSet = false; // This variable is used because it wasn't letting me set destination to null
     private Vector2Int prevTargetPosition;
+    private Vector2 unroundedPrevTargetPosition = new Vector2(0f, 0f);
 
     private int cycle = 0;
     private float offset;
@@ -171,27 +172,27 @@ public class BountyHunterController : MonoBehaviour
         Vector2 targetDirection = ((Vector2)target.position - enemyRB.position).normalized;
         float targetDistance = Vector2.Distance(enemyRB.position, target.position);
         Vector2Int targetPosition = new Vector2Int(Convert.ToInt32(target.position.x - 0.5f), Convert.ToInt32(target.position.y - 0.5f));
+        Vector2 targetVelocity = (Vector2)target.position - unroundedPrevTargetPosition;
 
-        // If the target moves to a different tile, move the destination
-        if (prevTargetPosition != null && destSet == true && targetPosition != prevTargetPosition)
+        // If the target moves to a different tile,
+        // and the destination is far from the player or the target is moving parallel to the bounty hunter's velocity vector,
+        // then move the destination
+        if (prevTargetPosition != null && destSet == true && targetPosition != prevTargetPosition
+            && (cycle == 0 || Mathf.Abs(Vector2.Dot(targetVelocity.normalized, enemyRB.linearVelocity.normalized)) > 0.707f))
         {
             int dx = targetPosition.x - prevTargetPosition.x;
             int dy = targetPosition.y - prevTargetPosition.y;
             Vector2 newDestination = destination + new Vector2(dx, dy);
-            // If the destination is close to the player, only move the destination half of the time
-            if (cycle == 0 || (targetPosition.x + targetPosition.y) % 2 == 0)
+            // Move the destination if it can be moved to match the target's movement
+            // If the destination being moved would cause it to collide with a wall, then calculate a new destination
+            if (wallTilemap.GetTile(new Vector3Int(Convert.ToInt32(newDestination.x), Convert.ToInt32(newDestination.y), 0)) == null)
             {
-                // Move the destination if it can be moved to match the target's movement
-                // If the destination being moved would cause it to collide with a wall, then calculate a new destination
-                if (wallTilemap.GetTile(new Vector3Int(Convert.ToInt32(newDestination.x), Convert.ToInt32(newDestination.y), 0)) == null)
-                {
-                    destination = newDestination;
-                }
-                else
-                {
-                    destination = CalculateNewDestination();
-                    destSet = true;
-                }
+                destination = newDestination;
+            }
+            else
+            {
+                destination = CalculateNewDestination();
+                destSet = true;
             }
         }
 

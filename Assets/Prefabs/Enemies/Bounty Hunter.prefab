@@ -241,8 +241,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 03e6152639cbf1443b183faffdef23b6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BountyHunterController
-  speed: 8
-  turnSpeed: 4
+  speed: 12
+  turnSpeed: 2
   detectionRadius: 12
   persistentRadius: 30
   closeRange: 1
