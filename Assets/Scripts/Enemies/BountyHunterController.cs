@@ -26,6 +26,9 @@ public class BountyHunterController : MonoBehaviour
     private float closeRange = 1f;
     [SerializeField, Tooltip("Max distance to the player the enemy will try to go.")]
     private float farRange = 6f;
+    [SerializeField, Tooltip("Distance to the enemy's pathfinding destination before it considers the pathfinding complete.")]
+    private float destinationRadius = 2f;
+
 
     [Header("Shooting")]
     [SerializeField, Tooltip("The bullet prefab.")]
@@ -175,10 +178,10 @@ public class BountyHunterController : MonoBehaviour
         Vector2 targetVelocity = (Vector2)target.position - unroundedPrevTargetPosition;
 
         // If the target moves to a different tile,
-        // and the destination is far from the player or the target is moving parallel to the bounty hunter's velocity vector,
+        // and the destination is far from the player or the target is moving parallel to the bounty hunter,
         // then move the destination
         if (prevTargetPosition != null && destSet == true && targetPosition != prevTargetPosition
-            && (cycle == 0 || Mathf.Abs(Vector2.Dot(targetVelocity.normalized, enemyRB.linearVelocity.normalized)) > 0.707f))
+            && (cycle == 0 || Mathf.Abs(Vector2.Dot(targetVelocity.normalized, ((Vector2)target.position - enemyRB.position).normalized)) > 0.707f))
         {
             int dx = targetPosition.x - prevTargetPosition.x;
             int dy = targetPosition.y - prevTargetPosition.y;
@@ -223,7 +226,8 @@ public class BountyHunterController : MonoBehaviour
 
         // If a path is found, move along the path
         // If the path is not found, but there is supposed to be one, assume it has been completed, so calculate a new path
-        if (path != null && path.Count > 0)
+        // or if the distance between the enemy and destination is small enough, the destination has been reached, so calculate a new path
+        if (path != null && path.Count > 0 && destSet && Vector2.Distance(enemyRB.position, destination) > destinationRadius)
         {
             // Calculate where to move to based on the path
             localDestination = (Vector2)path[0] + new Vector2(0.5f, 0.5f);
