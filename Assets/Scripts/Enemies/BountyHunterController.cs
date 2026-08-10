@@ -178,10 +178,10 @@ public class BountyHunterController : MonoBehaviour
         Vector2 targetVelocity = (Vector2)target.position - unroundedPrevTargetPosition;
 
         // If the target moves to a different tile,
-        // and the destination is far from the player or the target is moving parallel to the bounty hunter,
+        // and the destination is near the player and the target is moving parallel to the bounty hunter,
         // then move the destination
         if (prevTargetPosition != null && destSet == true && targetPosition != prevTargetPosition
-            && (cycle == 0 || Mathf.Abs(Vector2.Dot(targetVelocity.normalized, ((Vector2)target.position - enemyRB.position).normalized)) > 0.707f))
+            && (cycle == 1 && Mathf.Abs(Vector2.Dot(targetVelocity.normalized, ((Vector2)target.position - enemyRB.position).normalized)) > 0.707f))
         {
             int dx = targetPosition.x - prevTargetPosition.x;
             int dy = targetPosition.y - prevTargetPosition.y;
@@ -259,6 +259,16 @@ public class BountyHunterController : MonoBehaviour
 
     void OnDrawGizmos()
     {
+        if (cycle == 0)
+        {
+            Gizmos.color = Color.orange;
+        }
+        else if (cycle == 1)
+        {
+            Gizmos.color = Color.blue;
+        }
+        Gizmos.DrawSphere(enemyRB.position, 0.25f);
+
         if (path == null || path.Count < 2)
             return;
 

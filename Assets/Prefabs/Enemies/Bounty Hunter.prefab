@@ -247,6 +247,7 @@ MonoBehaviour:
   persistentRadius: 30
   closeRange: 1
   farRange: 6
+  destinationRadius: 2
   bulletObj: {fileID: 1548784170395063139, guid: 8389e4b733efd1c43b53a62f47b16fff, type: 3}
   muzzle: {fileID: 8679253230996936427}
   reactionTime: 0.3
