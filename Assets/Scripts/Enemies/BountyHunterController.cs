@@ -4,6 +4,12 @@
 * 
 * Description:
 *    Implements behavior for a bounty hunter ranged enemy.
+* State Machine Info:
+*    bool targetDetected determines whether the bounty hunter will pursue its target
+*    int cycle controls the current state of the movement
+*    When targetDetected == 1 and cycle == 0, the bounty hunter is moving toward the target
+*    When targetDetected == 1 and cycle == 1, the bounty hunter is moving away from the target  
+*    The bounty hunter pauses for a moment before starting a new cycle, so the bounty hunter will not move while temporaryHalt is true.
 *******************************************************/
 
 using System;
@@ -28,7 +34,8 @@ public class BountyHunterController : MonoBehaviour
     private float farRange = 6f;
     [SerializeField, Tooltip("Distance to the enemy's pathfinding destination before it considers the pathfinding complete.")]
     private float destinationRadius = 2f;
-
+    [SerializeField, Tooltip("Duration in seconds before the enemy starts charging toward its target again.")]
+    private float lingerDuration = 0.5f;
 
     [Header("Shooting")]
     [SerializeField, Tooltip("The bullet prefab.")]
@@ -67,6 +74,8 @@ public class BountyHunterController : MonoBehaviour
     private int cycle = 0;
     private float offset;
     private float initDistance; // Initial distance to destination
+    private float cycleCompleteTime;
+    private bool temporaryHalt = false;
 
     private bool lineOfSight = false;
     private bool targetDetected = false;
@@ -177,11 +186,13 @@ public class BountyHunterController : MonoBehaviour
         Vector2Int targetPosition = new Vector2Int(Convert.ToInt32(target.position.x - 0.5f), Convert.ToInt32(target.position.y - 0.5f));
         Vector2 targetVelocity = (Vector2)target.position - unroundedPrevTargetPosition;
 
+        Debug.Log(Mathf.Abs(Vector2.Dot(targetVelocity.normalized, ((Vector2)target.position - enemyRB.position).normalized)));
+
         // If the target moves to a different tile,
         // and the destination is near the player and the target is moving parallel to the bounty hunter,
         // then move the destination
         if (prevTargetPosition != null && destSet == true && targetPosition != prevTargetPosition
-            && (cycle == 1 && Mathf.Abs(Vector2.Dot(targetVelocity.normalized, ((Vector2)target.position - enemyRB.position).normalized)) > 0.707f))
+            && (cycle == 0 && Mathf.Abs(Vector2.Dot(targetVelocity.normalized, ((Vector2)target.position - enemyRB.position).normalized)) < 0.707f))
         {
             int dx = targetPosition.x - prevTargetPosition.x;
             int dy = targetPosition.y - prevTargetPosition.y;
@@ -202,6 +213,8 @@ public class BountyHunterController : MonoBehaviour
         // Calculate a new destination if there is no path yet, the tilemap has had time to load in, and the target is detected
         if (path == null && Time.fixedTime > 0 && targetDetected)
         {
+            // This is when and where the initial destination gets set
+            // TODO: this only ever needs to occur once, so double check if this only occurs once and figure what to do if it doesn't
             destination = CalculateNewDestination();
             destSet = true;
         }
@@ -224,10 +237,12 @@ public class BountyHunterController : MonoBehaviour
             localDestination = enemyRB.position;
         }
 
-        // If a path is found, move along the path
-        // If the path is not found, but there is supposed to be one, assume it has been completed, so calculate a new path
-        // or if the distance between the enemy and destination is small enough, the destination has been reached, so calculate a new path
-        if (path != null && path.Count > 0 && destSet && Vector2.Distance(enemyRB.position, destination) > destinationRadius)
+        // If a path is found, the destination has not been reached, and the bounty hunter is not pausing, then move along the path
+        // Otherwise, calculate a new path if:
+        // - Pathfinding didn't fail
+        // - The initial destination has already been set
+        // - The bounty hunter is not paused
+        if (path != null && path.Count > 0 && destSet && Vector2.Distance(enemyRB.position, destination) > destinationRadius && !temporaryHalt)
         {
             // Calculate where to move to based on the path
             localDestination = (Vector2)path[0] + new Vector2(0.5f, 0.5f);
@@ -238,13 +253,40 @@ public class BountyHunterController : MonoBehaviour
                 localDestination = (Vector2)path[1] + new Vector2(0.5f, 0.5f);
             }
         }
-        else if (destSet == true)
+        else if (path != null && destSet && !temporaryHalt)
         {
+            // The bounty hunter's destination has been reached, so update the cycle
+            cycle = (cycle + 1) % 2;
+            // If cycle is now 0, queue the calculation of a new destination because the bounty hunter pauses for a moment before charging toward the player
+            // if cycle is now 1, calculate a new destination immediately
+            if (cycle == 0)
+            {
+                // Queue the calculation of a new destination
+                temporaryHalt = true;
+                cycleCompleteTime = Time.time;
+            }
+            else
+            {
+                // Calculate a new destination
+                destination = CalculateNewDestination();
+            }
+        }
+
+        // For calculating a new destination once the bounty hunter is ready to charge toward the target again
+        if (temporaryHalt && Time.time > cycleCompleteTime + lingerDuration)
+        {
+            temporaryHalt = false;
             destination = CalculateNewDestination();
         }
 
-        // Calculate how fast the enemy should be moving, but lerp toward it to avoid too sharp of turns (bounty hunter is on a horse)
+        // Calculate how fast the enemy should be moving
         Vector2 desiredVelocity = (localDestination - enemyRB.position).normalized * speed;
+        // The bounty hunter pauses before charging toward the player again, so for a small duration, overwrite the desired velocity with 0
+        if (temporaryHalt)
+        {
+            desiredVelocity = new Vector2(0f, 0f);
+        }
+        // Lerp toward the desired velocity to avoid too sharp of turns (the bounty hunter is on a horse)
         enemyRB.linearVelocity = Vector2.Lerp(enemyRB.linearVelocity, desiredVelocity, turnSpeed * Time.fixedDeltaTime);
 
         // Face the target if it is detected
@@ -283,6 +325,7 @@ public class BountyHunterController : MonoBehaviour
         }
     }
 
+    // Calculate the pathfinding destination for the bounty hunter
     Vector2 CalculateNewDestination()
     {
         // If cycle is 0, move close to the target
@@ -304,8 +347,6 @@ public class BountyHunterController : MonoBehaviour
                 dist = UnityEngine.Random.Range(closeRange, farRange);
                 angle = UnityEngine.Random.Range(0f, Mathf.PI * 2f);
             }
-            // Update cycle before returning
-            cycle = (cycle + 1) % 2;
             // Return the selected position as the destination
             Vector2 selectedPosition = new Vector2(target.position.x + dist * Mathf.Cos(angle), target.position.y + dist * Mathf.Sin(angle));
             initDistance = Vector2.Distance(enemyRB.position, selectedPosition);
@@ -325,8 +366,6 @@ public class BountyHunterController : MonoBehaviour
                 dist = UnityEngine.Random.Range(closeRange, farRange);
                 angle = UnityEngine.Random.Range(0f, Mathf.PI * 2f);
             }
-            // Update cycle before returning
-            cycle = (cycle + 1) % 2;
             // Return the selected position as the destination
             Vector2 selectedPosition = new Vector2(target.position.x + dist * Mathf.Cos(angle), target.position.y + dist * Mathf.Sin(angle));
             initDistance = Vector2.Distance(enemyRB.position, selectedPosition);
