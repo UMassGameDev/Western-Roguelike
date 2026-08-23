@@ -214,6 +214,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxHealth: 1
+  points: 10
   OnDeath:
     m_PersistentCalls:
       m_Calls:
@@ -252,6 +253,7 @@ MonoBehaviour:
   reactionTime: 0.3
   cooldown: 0.5
   bulletSpeed: 60
+  bulletDamage: 1
   chambers: 6
   reloadTime: 3
   shootSound: {fileID: 8300000, guid: cac629d478abb654bafd3f1c39acc3e7, type: 3}

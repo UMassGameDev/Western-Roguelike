@@ -12,16 +12,22 @@ using UnityEngine.Events;
 public class EnemyHealth : MonoBehaviour
 {
     [SerializeField, Tooltip("Default health for this enemy.")] 
-    private int maxHealth = 2;
-
-    private int currentHealth;
+    private int maxHealth;
+    [SerializeField, Tooltip("Number of points awarded when this enemy is defeated.")] 
+    private int points;
 
     [SerializeField, Tooltip("These functions are called when the enemy runs out of health.")] 
     private UnityEvent OnDeath; // Attach functions to this in the Unity Inspector
 
+    private int currentHealth;
+
+    private Score score; // Reference to the score object
+
     void Awake()
     {
         currentHealth = maxHealth;
+
+        score = FindFirstObjectByType<Score>();
     }
 
     //~(Damage)~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -42,6 +48,9 @@ public class EnemyHealth : MonoBehaviour
     // Kills enemy (respectfully)
     public void Kill()
     {
+        // Update the player's score
+        score.AddScore(points);
+
         // Invokes all functions attached to the OnDeath event.
         // If you want to attach functions to the OnDeath event, do it in the Unity Inspector.
         OnDeath.Invoke();

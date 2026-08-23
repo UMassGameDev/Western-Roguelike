@@ -183,6 +183,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxHealth: 1
+  points: 10
   OnDeath:
     m_PersistentCalls:
       m_Calls:
@@ -211,8 +212,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ZombieController
   moveSpeed: 2
-  pathfinder: {fileID: 0}
-  wallTilemap: {fileID: 0}
+  detectionRadius: 12
+  persistentRadius: 20
   audioSource: {fileID: 7529072245145663537}
 --- !u!1 &6547805222266007321
 GameObject:

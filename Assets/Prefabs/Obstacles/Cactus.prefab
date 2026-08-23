@@ -154,6 +154,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxHealth: 1
+  points: 1
   OnDeath:
     m_PersistentCalls:
       m_Calls:
