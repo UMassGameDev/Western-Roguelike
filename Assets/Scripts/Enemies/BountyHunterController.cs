@@ -287,7 +287,15 @@ public class BountyHunterController : MonoBehaviour
             desiredVelocity = new Vector2(0f, 0f);
         }
         // Lerp toward the desired velocity to avoid too sharp of turns (the bounty hunter is on a horse)
-        enemyRB.linearVelocity = Vector2.Lerp(enemyRB.linearVelocity, desiredVelocity, turnSpeed * Time.fixedDeltaTime);
+        // Turn speed is increased while halting so the bounty hunger won't slide as far
+        if (!temporaryHalt)
+        {
+            enemyRB.linearVelocity = Vector2.Lerp(enemyRB.linearVelocity, desiredVelocity, turnSpeed * Time.fixedDeltaTime);
+        }
+        else
+        {
+            enemyRB.linearVelocity = Vector2.Lerp(enemyRB.linearVelocity, desiredVelocity, turnSpeed * 1.5f * Time.fixedDeltaTime);
+        }
 
         // Face the target if it is detected
         if (targetDetected)
