@@ -45,8 +45,6 @@ public class Score : MonoBehaviour
 
         // Update the display
         scoreDisplay.text = score.ToString("D6");
-
-        Debug.Log(score);
     }
 
     //~(SetScore)~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

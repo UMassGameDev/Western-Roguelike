@@ -60,6 +60,7 @@ public class BountyHunterController : MonoBehaviour
     AudioSource audioSource;
 
     private Rigidbody2D enemyRB;
+    private GameObject rotatedPart;
     private Transform target; // The player is the enemy's target and this gets assigned automatically
     private Camera cameraInstance;
 
@@ -90,6 +91,9 @@ public class BountyHunterController : MonoBehaviour
     {
         // Assign self rigidbody
         enemyRB = GetComponent<Rigidbody2D>();
+
+        // Assign the part of the enemy that gets rotated
+        rotatedPart = GameObject.Find("Will Rotate");
 
         // Assigns playerObj to target automatically
         GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
@@ -301,7 +305,7 @@ public class BountyHunterController : MonoBehaviour
         if (targetDetected)
         {           
             float angle = CalculateAngle(targetDirection);
-            transform.rotation = RotateBy(angle);
+            rotatedPart.transform.rotation = RotateBy(angle);
         }
 
         prevTargetPosition = new Vector2Int(Convert.ToInt32(target.position.x - 0.5f), Convert.ToInt32(target.position.y - 0.5f));

@@ -27,7 +27,7 @@ public class ObjectHealth : MonoBehaviour
     {
         currentHealth = maxHealth;
 
-        score = FindFirstObjectByType<Score>();
+        score = FindAnyObjectByType<Score>();
     }
 
     //~(Damage)~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
