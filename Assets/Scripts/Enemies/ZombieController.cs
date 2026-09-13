@@ -23,6 +23,7 @@ public class ZombieController : MonoBehaviour
     private float persistentRadius = 20f;
 
     private Rigidbody2D zombieRB;
+    private Transform rotatedPart; // Components of the enemy that get rotated with the enemy as it turns
     private Transform target; // The player is the zombie's target and this gets assigned automatically
 
     private Pathfinder pathfinder; // Alternative implementation: each ZombieController could use its own pathfinder object
@@ -41,6 +42,9 @@ public class ZombieController : MonoBehaviour
     {
         // Assign self rigidbody
         zombieRB = GetComponent<Rigidbody2D>();
+
+        // Assign the part of the enemy that gets rotated with the enemy as it turns
+        rotatedPart = transform.Find("Will Rotate");
 
         // Assigns playerObj to target automatically
         GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
@@ -137,7 +141,7 @@ public class ZombieController : MonoBehaviour
 
             // Face the target
             float angle = CalculateAngle(targetDirection);
-            transform.rotation = RotateBy(angle);
+            rotatedPart.rotation = RotateBy(angle);
         }
     }
     
