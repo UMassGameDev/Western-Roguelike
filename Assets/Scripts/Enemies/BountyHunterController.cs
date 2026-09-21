@@ -202,16 +202,17 @@ public class BountyHunterController : MonoBehaviour
             int dy = targetPosition.y - prevTargetPosition.y;
             Vector2 newDestination = destination + new Vector2(dx, dy);
             // Move the destination if it can be moved to match the target's movement
-            // If the destination being moved would cause it to collide with a wall, then calculate a new destination
+            // Do not move the destination if it would end up colliding with a wall
             if (wallTilemap.GetTile(new Vector3Int(Convert.ToInt32(newDestination.x), Convert.ToInt32(newDestination.y), 0)) == null)
             {
                 destination = newDestination;
             }
-            else
-            {
-                destination = CalculateNewDestination();
-                destSet = true;
-            }
+            // If the destination being moved would cause it to collide with a wall, then calculate a new destination
+            //else
+            //{
+            //    destination = CalculateNewDestination();
+            //    destSet = true;
+            //}
         }
 
         // Calculate a new destination if there is no path yet, the tilemap has had time to load in, and the target is detected
