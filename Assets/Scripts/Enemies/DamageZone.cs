@@ -20,9 +20,9 @@ public class DamageZone : MonoBehaviour
     // Detect overlap with player
     private void OnTriggerEnter2D(Collider2D collider)
     {
-        playerHealth = collider.gameObject.GetComponent<PlayerHealth>();
-        if (playerHealth != null)
+        if (collider.gameObject.GetComponent<PlayerHealth>() != null)
         {
+            playerHealth = collider.gameObject.GetComponent<PlayerHealth>();
             playerOverlap = true;
         }
     }
@@ -30,9 +30,9 @@ public class DamageZone : MonoBehaviour
     // Detect overlap with player ending
     private void OnTriggerExit2D(Collider2D collider)
     {
-        playerHealth = collider.gameObject.GetComponent<PlayerHealth>();
-        if (playerHealth != null)
+        if (collider.gameObject.GetComponent<PlayerHealth>() != null)
         {
+            playerHealth = collider.gameObject.GetComponent<PlayerHealth>();
             playerOverlap = false;
         }
     }

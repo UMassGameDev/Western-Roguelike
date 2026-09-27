@@ -193,6 +193,17 @@ MonoBehaviour:
   plainsBiomeCactusPercentage: 0.01
   cactusBiomeCactusPercentage: 0.5
   enemyPercentage: 0.1
+--- !u!114 &275062531 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8367906457242774513, guid: 9322d87ae9bd38843aad9aaf941009fa, type: 3}
+  m_PrefabInstance: {fileID: 2483766438372452734}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4f8c08402542a814aab6e64afae118a6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: '::'
 --- !u!1001 &402167041
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -247,15 +258,31 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6845731366923069349, guid: 2bcbb7500a891274ab893eaf5c028db3, type: 3}
       propertyPath: OnDeath.m_PersistentCalls.m_Calls.Array.size
-      value: 0
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 6845731366923069349, guid: 2bcbb7500a891274ab893eaf5c028db3, type: 3}
-      propertyPath: OnDeath.m_PersistentCalls.m_Calls.Array.data[0].m_Target
-      value: 
-      objectReference: {fileID: 1393856618}
+      propertyPath: OnDeath.m_PersistentCalls.m_Calls.Array.data[3].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6845731366923069349, guid: 2bcbb7500a891274ab893eaf5c028db3, type: 3}
-      propertyPath: OnDeath.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
+      propertyPath: OnDeath.m_PersistentCalls.m_Calls.Array.data[3].m_Target
+      value: 
+      objectReference: {fileID: 275062531}
+    - target: {fileID: 6845731366923069349, guid: 2bcbb7500a891274ab893eaf5c028db3, type: 3}
+      propertyPath: OnDeath.m_PersistentCalls.m_Calls.Array.data[3].m_CallState
       value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 6845731366923069349, guid: 2bcbb7500a891274ab893eaf5c028db3, type: 3}
+      propertyPath: OnDeath.m_PersistentCalls.m_Calls.Array.data[3].m_MethodName
+      value: Pause
+      objectReference: {fileID: 0}
+    - target: {fileID: 6845731366923069349, guid: 2bcbb7500a891274ab893eaf5c028db3, type: 3}
+      propertyPath: OnDeath.m_PersistentCalls.m_Calls.Array.data[3].m_TargetAssemblyTypeName
+      value: MusicHandler, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 6845731366923069349, guid: 2bcbb7500a891274ab893eaf5c028db3, type: 3}
+      propertyPath: OnDeath.m_PersistentCalls.m_Calls.Array.data[3].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -852,10 +879,26 @@ PrefabInstance:
       propertyPath: m_PlayOnAwake
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 161634366866079687, guid: fca8d11eb8a48c44cbbbff7f7512431a, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 253003020266012350, guid: fca8d11eb8a48c44cbbbff7f7512431a, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1754845794407196284, guid: fca8d11eb8a48c44cbbbff7f7512431a, type: 3}
       propertyPath: playerHealth
       value: 
       objectReference: {fileID: 1213993823}
+    - target: {fileID: 2212336762037644958, guid: fca8d11eb8a48c44cbbbff7f7512431a, type: 3}
+      propertyPath: m_fontColor.a
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2212336762037644958, guid: fca8d11eb8a48c44cbbbff7f7512431a, type: 3}
+      propertyPath: m_fontColor32.rgba
+      value: 255
+      objectReference: {fileID: 0}
     - target: {fileID: 5705442415838829115, guid: fca8d11eb8a48c44cbbbff7f7512431a, type: 3}
       propertyPath: m_Pivot.x
       value: 0
@@ -957,11 +1000,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: fca8d11eb8a48c44cbbbff7f7512431a, type: 3}
---- !u!1 &1393856618 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 1221787448447008879, guid: 2bcbb7500a891274ab893eaf5c028db3, type: 3}
-  m_PrefabInstance: {fileID: 402167041}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1492193404 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 2302360801736180166, guid: f9e6328026d43a649a47cf4284ba67db, type: 3}

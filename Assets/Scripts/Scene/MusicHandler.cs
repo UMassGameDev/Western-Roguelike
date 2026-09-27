@@ -8,6 +8,7 @@
 
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class MusicHandler : MonoBehaviour
 {
@@ -45,8 +46,12 @@ public class MusicHandler : MonoBehaviour
 
     private void Update()
     {
-
-        if (dayNightHandler.IsDay())
+        if (SceneManager.GetActiveScene().name == "TitleScene" || SceneManager.GetActiveScene().name == "GameOverScene")
+        {
+            // Music is handled by a different script in the TitleScene and GameOverScene
+            audioSource.Stop();
+        }
+        else if (dayNightHandler.IsDay())
         {
             // If nighttime music is playing during the day, fade it out
             if (nightMusic.Contains(audioSource.clip))

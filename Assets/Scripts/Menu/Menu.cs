@@ -10,8 +10,8 @@ public class Menu : MonoBehaviour
     ///     Starts the game w/fade effect.
     /// </summary>
     /// <remarks>
-    ///     Currently, this just loads MainScene.unity.
-    ///     Update when save files are implemented.
+    ///     Currently, this just loads InfiniteScene.unity.
+    ///     Update if save files are implemented.
     /// </remarks>
     /// <example>
     ///     Menu.PlayGame();
@@ -20,7 +20,7 @@ public class Menu : MonoBehaviour
     /// <seealso cref="Menu.Quit()"/>
     public static void PlayGame()
     {
-        SceneLoader.Instance.LoadSceneWithFade("MainScene");
+        SceneLoader.Instance.LoadSceneWithFade("InfiniteScene");
     }
     public static void MainMenu()
     {

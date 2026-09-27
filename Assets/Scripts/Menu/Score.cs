@@ -14,6 +14,9 @@ public class Score : MonoBehaviour
     // This is where the score is stored
     private int score;
 
+    // For transferring the value of the score to the game over scene
+    public static int tempScore;
+
     // Reference to the score text so it is kept updated
     [SerializeField] private TextMeshProUGUI scoreDisplay;
 
@@ -35,6 +38,7 @@ public class Score : MonoBehaviour
     // Adds to the player's score. (To subtract, use a negative number)
     public void AddScore(int increment)
     {
+        // Increment the player's score
         score += increment;
 
         // Prevent negative scores
@@ -42,6 +46,9 @@ public class Score : MonoBehaviour
         {
             score = 0;
         }
+
+        // Keep tempScore updated
+        tempScore = score;
 
         // Update the display
         scoreDisplay.text = score.ToString("D6");
@@ -51,6 +58,7 @@ public class Score : MonoBehaviour
     // Sets the player's score
     public void SetScore(int newScore)
     {
+        // Set the player's score
         score = newScore;
 
         // Prevent negative scores
@@ -58,6 +66,9 @@ public class Score : MonoBehaviour
         {
             score = 0;
         }
+
+        // Keep tempScore updated
+        tempScore = score;
 
         // Update the display
         scoreDisplay.text = score.ToString("D6");
