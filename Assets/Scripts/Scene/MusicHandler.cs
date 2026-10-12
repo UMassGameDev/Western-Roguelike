@@ -24,6 +24,10 @@ public class MusicHandler : MonoBehaviour
     private List<AudioClip> dayMusic;
     [SerializeField]
     private List<AudioClip> nightMusic;
+    [SerializeField]
+    private AudioClip titleScreenMusic;
+    [SerializeField]
+    private AudioClip gameOverMusic;
 
     private DayNightHandler dayNightHandler;
     private float currentFadeTime = 0.0f;
@@ -46,16 +50,42 @@ public class MusicHandler : MonoBehaviour
 
     private void Update()
     {
-        if (SceneManager.GetActiveScene().name == "TitleScene" || SceneManager.GetActiveScene().name == "GameOverScene")
+        if (SceneManager.GetActiveScene().name == "TitleScene")
         {
-            // Music is handled by a different script in the TitleScene and GameOverScene
-            audioSource.Stop();
+            // Stop the music if it is not playing title screen music
+            if (audioSource.clip != titleScreenMusic)
+            {
+                audioSource.Stop();
+            }
+
+            audioSource.volume = volume;
+            if (!audioSource.isPlaying)
+            {
+                audioSource.clip = titleScreenMusic;
+                audioSource.Play();
+            }
+        }
+        else if (SceneManager.GetActiveScene().name == "GameOverScene")
+        {
+            // Stop the music if it is not playing game over music
+            if (audioSource.clip != gameOverMusic)
+            {
+                audioSource.Stop();
+            }
+
+            audioSource.volume = volume;
+            if (!audioSource.isPlaying)
+            {
+                audioSource.clip = gameOverMusic;
+                audioSource.Play();
+            }
         }
         else if (dayNightHandler.IsDay())
         {
-            // If nighttime music is playing during the day, fade it out
             if (nightMusic.Contains(audioSource.clip))
             {
+                // If nighttime music is playing during the day, fade it out
+
                 currentFadeTime += Time.deltaTime;
                 audioSource.volume = volume * (1.0f - currentFadeTime / fadeTime);
 
@@ -64,6 +94,11 @@ public class MusicHandler : MonoBehaviour
                     audioSource.Stop();
                     currentFadeTime = 0.0f;
                 }
+            }
+            else if (audioSource.clip == titleScreenMusic || audioSource.clip == gameOverMusic)
+            {
+                // Stop the music if it is still playing title screen or game over music in-game
+                audioSource.Stop();
             }
             else
             {
@@ -92,6 +127,11 @@ public class MusicHandler : MonoBehaviour
                     audioSource.Stop();
                     currentFadeTime = 0.0f;
                 }
+            }
+            else if (audioSource.clip == titleScreenMusic || audioSource.clip == gameOverMusic)
+            {
+                // Stop the music if it is still playing title screen or game over music in-game
+                audioSource.Stop();
             }
             else
             {

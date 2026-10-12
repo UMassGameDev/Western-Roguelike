@@ -7,6 +7,7 @@
 *******************************************************/
 
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class DayNightHandler : MonoBehaviour
 {
@@ -14,7 +15,7 @@ public class DayNightHandler : MonoBehaviour
     private int maxTime;
 
     public static DayNightHandler instance;
-    private float time = 0; // Current time of day in seconds
+    private float time = 0f; // Current time of day in seconds
     private int day = 1; // Current day count (each day that passes increments this number by 1)
 
     private void Awake()
@@ -40,6 +41,11 @@ public class DayNightHandler : MonoBehaviour
         {
             time -= maxTime;
             ++day;
+        }
+
+        if (SceneManager.GetActiveScene().name == "TitleScene" || SceneManager.GetActiveScene().name == "GameOverScene")
+        {
+            time = 0f;
         }
     }
 
