@@ -53,8 +53,8 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 09725d662c7220d41ab2b2995e28c5b8, type: 3}
   nightMusic:
   - {fileID: 8300000, guid: dca525d4869914f4f9eb5b6a6e0ec001, type: 3}
-  titleScreenMusic: {fileID: 8300000, guid: b480bfab5e1143f4badfc35f79d9fc9e, type: 3}
-  gameOverMusic: {fileID: 0}
+  titleScreenMusic: {fileID: 8300000, guid: 7b1b163bcc452694a9db97bb53e1404d, type: 3}
+  gameOverMusic: {fileID: 8300000, guid: fa2f14359bbe41242bae6b5957eea55c, type: 3}
 --- !u!82 &6408792867544248072
 AudioSource:
   m_ObjectHideFlags: 0

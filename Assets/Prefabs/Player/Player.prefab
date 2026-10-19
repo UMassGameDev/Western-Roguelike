@@ -467,9 +467,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 73b9c8d6461a59e46a5ab44ea0597e4f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  bulletObj: {fileID: 1548784170395063139, guid: 3b86f00c3c96cfc43bde2a3886234bf7, type: 3}
-  flareObj: {fileID: 5832922978901417772, guid: fc6664f3f32ca0340b0444a806874dd5, type: 3}
   muzzle: {fileID: 4455725133419971136}
+  bulletObj: {fileID: 1548784170395063139, guid: 3b86f00c3c96cfc43bde2a3886234bf7, type: 3}
+  flareEnabled: 1
+  flareObj: {fileID: 5832922978901417772, guid: fc6664f3f32ca0340b0444a806874dd5, type: 3}
   cooldown: 0.5
   bulletSpeed: 60
   bulletDamage: 1
@@ -477,6 +478,8 @@ MonoBehaviour:
   shootSound: {fileID: 8300000, guid: cac629d478abb654bafd3f1c39acc3e7, type: 3}
   audioSource: {fileID: 7551574136678995364}
   gunAnimator: {fileID: 463797740037372244}
+  standardBulletPrefab: {fileID: 1548784170395063139, guid: 3b86f00c3c96cfc43bde2a3886234bf7, type: 3}
+  shotgunBulletPrefab: {fileID: 1548784170395063139, guid: 8389e4b733efd1c43b53a62f47b16fff, type: 3}
 --- !u!212 &3705407621302456873
 SpriteRenderer:
   serializedVersion: 2

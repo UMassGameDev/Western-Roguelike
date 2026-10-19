@@ -9,10 +9,10 @@ EditorBuildSettings:
     path: Assets/Scenes/TitleScene.unity
     guid: ce4caaa3230eb3d46a7d31592b16cb0c
   - enabled: 0
-    path: Assets/Scenes/MainScene.unity
+    path: Assets/Scenes/Unused/MainScene.unity
     guid: 8c9cfa26abfee488c85f1582747f6a02
   - enabled: 0
-    path: Assets/Scenes/RandomScene.unity
+    path: Assets/Scenes/Unused/RandomScene.unity
     guid: 2587d95f82faa6c4bb5554fe36a96195
   - enabled: 1
     path: Assets/Scenes/InfiniteScene.unity

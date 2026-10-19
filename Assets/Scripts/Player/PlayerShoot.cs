@@ -20,14 +20,17 @@ using UnityEngine;
 /// <seealso cref="Bullet">Bullet currently fired.</seealso>
 public class PlayerShoot : MonoBehaviour
 {
-    // Editor variables:
-    [Header("Shooting")]
-    [SerializeField, Tooltip("The bullet prefab.")]
-    GameObject bulletObj;
-    [SerializeField, Tooltip("The muzzle flare prefab.")]
-    GameObject flareObj;
     [SerializeField, Tooltip("Where the bullet is spawned.")]
     Transform muzzle;
+
+    // Editor variables:
+    [Header("Default weapon")]
+    [SerializeField, Tooltip("The bullet prefab.")]
+    GameObject bulletObj;
+    [SerializeField, Tooltip("Whether to use the flare prefab or not.")]
+    bool flareEnabled = true;
+    [SerializeField, Tooltip("The muzzle flare prefab.")]
+    GameObject flareObj;
     [SerializeField, Tooltip("Time until next bullet can be shot."), Min(0f)]
     float cooldown = 0.5f;
     [SerializeField, Tooltip("Bullet speed.")] 
@@ -44,6 +47,12 @@ public class PlayerShoot : MonoBehaviour
     AudioSource audioSource;
     [SerializeField, Tooltip("The animator that controls gun animations.")]
     Animator gunAnimator;
+
+    [Header("Resources")]
+    [SerializeField, Tooltip("The standard bullet prefab.")]
+    GameObject standardBulletPrefab;
+    [SerializeField, Tooltip("The shotgun bullet prefab.")]
+    GameObject shotgunBulletPrefab;
 
     // Internal variables:
     float lastShotTime;
@@ -67,21 +76,63 @@ public class PlayerShoot : MonoBehaviour
 
     void Shoot()
     {
-        GameObject flare = Instantiate(flareObj, muzzle.position, muzzle.rotation, muzzle);
-        Destroy(flare, 0.1f);
-        GameObject bullet = Instantiate(bulletObj, transform.position, muzzle.rotation);
-        Bullet bulletScript = bullet.GetComponent<Bullet>();
-        bulletScript.SetVelocity(-muzzle.up * bulletSpeed);
-        bulletScript.SetDamage(bulletDamage);
-        bulletScript.SetPiercing(bulletPiercing);
-        bulletScript.SetPlayerBullet(true);
-        // The player's bullet appears in front of the player for a frame, so this fixes that.
-        // The bullet script will automatically reenables its renderer after 1 frame.
-        bulletScript.GetComponent<Renderer>().enabled = false;
+        // Temporarily spawn the flare if the flare is enabled
+        if (flareEnabled)
+        {
+            GameObject flare = Instantiate(flareObj, muzzle.position, muzzle.rotation, muzzle);
+            Destroy(flare, 0.1f);
+        }
 
+        // Spawn the bullet
+        GameObject bullet = Instantiate(bulletObj, transform.position, muzzle.rotation);
+        if (bullet.GetComponent<Bullet>() != null)
+        {
+            Bullet bulletScript = bullet.GetComponent<Bullet>();
+            bulletScript.SetVelocity(-muzzle.up * bulletSpeed);
+            bulletScript.SetDamage(bulletDamage);
+            bulletScript.SetPiercing(bulletPiercing);
+            bulletScript.SetPlayerBullet(true);
+            // The player's bullet appears in front of the player for a frame, so this fixes that.
+            // The bullet script will automatically reenables its renderer after 1 frame.
+            bulletScript.GetComponent<Renderer>().enabled = false;
+        }
+        else if (bullet.GetComponent<ShotgunBullet>() != null)
+        {
+            ShotgunBullet bulletScript = bullet.GetComponent<ShotgunBullet>();
+            bulletScript.SetDamage(bulletDamage);
+            bulletScript.SetPlayerBullet(true);
+        }
+
+        // Shoot sound
         bool soundInitialized = audioSource != null && shootSound != null;
         if (soundInitialized) { PlaySound(); }
     }
 
     void PlaySound() => audioSource.PlayOneShot(shootSound);
+
+    public void EquipPistol()
+    {
+        bulletObj = standardBulletPrefab;
+        flareEnabled = true;
+        cooldown = 0.5f;
+        bulletDamage = 1;
+        bulletPiercing = 1;
+    }
+
+    public void EquipRifle()
+    {
+        bulletObj = standardBulletPrefab;        
+        flareEnabled = true;
+        cooldown = 1f;
+        bulletDamage = 2;
+        bulletPiercing = 5;
+    }
+    
+    public void EquipShotgun()
+    {
+        bulletObj = shotgunBulletPrefab;
+        flareEnabled = false;
+        cooldown = 1f;
+        bulletDamage = 3;
+    }
 }
