@@ -2006,6 +2006,7 @@ GameObject:
   - component: {fileID: 276214323024475761}
   - component: {fileID: 941921375050230762}
   - component: {fileID: -4521012019761372971}
+  - component: {fileID: 9026112971756554578}
   m_Layer: 5
   m_Name: UI (Canvas)
   m_TagString: Untagged
@@ -2255,6 +2256,19 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &9026112971756554578
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6822988937946351932}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6e386a55672ad6a43a3ecef5cf7f514c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ToggleInventory
+  Inventory: {fileID: 1244359969284503075}
 --- !u!1 &7682374480302836840
 GameObject:
   m_ObjectHideFlags: 0

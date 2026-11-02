@@ -18,7 +18,7 @@ public class ToggleInventory : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.E))
         {
-            Debug.Log("E key was pressed!");
+            //Debug.Log("E key was pressed!");
             ToggleInventoryUI();
         }
     }
@@ -27,7 +27,7 @@ public class ToggleInventory : MonoBehaviour
     {
         if (Inventory != null)
         {
-            Debug.Log("should toggle");
+            //Debug.Log("should toggle");
 
             // Check the current active state and flip it (Invert it using !)
             bool isActive = Inventory.activeSelf;
