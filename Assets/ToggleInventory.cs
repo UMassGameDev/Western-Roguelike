@@ -5,20 +5,18 @@ public class ToggleInventory : MonoBehaviour
     public GameObject Inventory;
 
     // This runs automatically once when the game starts
-    private void Start()
+    private void Start() // Leave it blank for future edits, since the game already starts without it being active.
     {
-        if (Inventory != null)
+        /*if (Inventory != null)
         {
             // Force the inventory to start invisible
             Inventory.SetActive(false);
-        }
+        }*/
     }
-
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.E))
         {
-            Debug.Log("E key was pressed!");
             ToggleInventoryUI();
         }
     }
@@ -27,8 +25,6 @@ public class ToggleInventory : MonoBehaviour
     {
         if (Inventory != null)
         {
-            Debug.Log("should toggle");
-
             // Check the current active state and flip it (Invert it using !)
             bool isActive = Inventory.activeSelf;
             Inventory.SetActive(!isActive);
