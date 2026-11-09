@@ -11,6 +11,7 @@ public class PlayerMovement : MonoBehaviour
 
     private Rigidbody2D playerRB;
     private Vector3 moveDir;
+    private Animator playerAnimator;
 
     // List of trigger colliders objects overlapped with the player 
     private List<Collider2D> currentColliders = new List<Collider2D>();
@@ -22,6 +23,7 @@ public class PlayerMovement : MonoBehaviour
     void Awake()
     {
         playerRB = GetComponent<Rigidbody2D>();
+        playerAnimator = GetComponent<Animator>();
     }
 
     // Updates <moveDir> based on what arrow button is held, and rotates sprite accordingly:
@@ -33,6 +35,25 @@ public class PlayerMovement : MonoBehaviour
         if (Input.GetKey(KeyCode.LeftArrow) || Input.GetKey(KeyCode.A)) { moveDir.x -= 1; }
         if (Input.GetKey(KeyCode.DownArrow) || Input.GetKey(KeyCode.S)) { moveDir.y -= 1; }
         if (Input.GetKey(KeyCode.RightArrow) || Input.GetKey(KeyCode.D)) { moveDir.x += 1; }
+
+        if (moveDir.y != 0 && moveDir.x != 0) {
+            playerAnimator.SetInteger("x", Mathf.RoundToInt(moveDir.x));
+            playerAnimator.SetInteger("y", 0);
+        }
+        else
+        {
+            playerAnimator.SetInteger("x", Mathf.RoundToInt(moveDir.x));
+            playerAnimator.SetInteger("y", Mathf.RoundToInt(moveDir.y));
+        }
+
+        if (moveDir.x == 0 && moveDir.y == 0)
+        {
+            playerAnimator.SetBool("isIdle", true);
+        }
+        else
+        {
+            playerAnimator.SetBool("isIdle", false);
+        }
 
         // Check for overlap with cacti to update onCactus variable
         onCactus = false;
